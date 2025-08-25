@@ -26,4 +26,8 @@ export default class ErrorResponse {
       errorDetail: this.detail || "...",
     };
   }
+
+  public getErrorHttpCode() {
+    return this.errorResponseItem[0];
+  }
 }
