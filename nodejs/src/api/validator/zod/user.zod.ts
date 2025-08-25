@@ -2,6 +2,15 @@ import * as z from "zod";
 
 export const registerUserSchema = z.object({
   user_email: z.email("Please enter a valid email").min(1, "Email is required"),
+  user_password: z
+    .string()
+    .min(6, "Password must be at least 6 characters long")
+    .max(24, "Password must be at most 24 characters long")
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\sA-Za-z0-9])[^\s]+$/,
+      "Password must contain at least one lowercase letter, one uppercase letter, one number, one special character and must not contain spaces"
+    ),
+
   user_firstName: z.string().min(1, "First name is required"),
   user_lastName: z.string().min(1, "Last name is required"),
   user_gender: z.boolean(),
@@ -31,3 +40,10 @@ export const registerUserSchema = z.object({
 });
 
 export type RegisterUserInput = z.infer<typeof registerUserSchema>;
+
+export const loginUserSchema = z.object({
+  user_email: z.email("Please enter a valid email").min(1, "Email is required"),
+  user_password: z.string().min(6, "Password is required"),
+});
+
+export type LoginUserInput = z.infer<typeof loginUserSchema>;

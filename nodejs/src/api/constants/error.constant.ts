@@ -32,4 +32,22 @@ export const errorResponses = {
     "User already exists",
     "User with this email already exists",
   ] as ErrorResponseItem,
+
+  AUTH_KEY_TOKEN_NOT_FOUND: [
+    HttpStatus.NOT_FOUND,
+    "Key token not found",
+    "Key token not found or expired",
+  ] as ErrorResponseItem,
+
+  AUTH_USER_NOT_FOUND: [
+    HttpStatus.NOT_FOUND,
+    "User not found",
+    "User with this email does not exist",
+  ] as ErrorResponseItem,
+
+  AUTH_INVALID_CREDENTIALS: [
+    HttpStatus.UNAUTHORIZED,
+    "Invalid credentials",
+    "Email or password is incorrect",
+  ] as ErrorResponseItem,
 };

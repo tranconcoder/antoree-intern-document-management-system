@@ -8,7 +8,10 @@ export const USER_DOCUMENT_NAME = "User";
 
 export interface User extends TimeStamps {
   id: string;
+
   user_email: string;
+  user_password: string;
+
   user_firstName: string;
   user_lastName: string;
   user_gender: boolean;
@@ -19,6 +22,8 @@ export interface User extends TimeStamps {
 export const userSchema = new Schema<User>(
   {
     user_email: { type: String, required: true, unique: true, index: true },
+    user_password: { type: String, required: true },
+
     user_firstName: { type: String, required: true },
     user_lastName: { type: String, required: true },
     user_gender: { type: Boolean, required: true },
