@@ -11,6 +11,9 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/helmet": "^4.0.0",
+    "@types/morgan": "^1.9.10",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
     "express": "^5.1.0",
