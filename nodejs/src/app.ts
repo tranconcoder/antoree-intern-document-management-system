@@ -5,6 +5,7 @@ import helmet from "helmet";
 import compression from "compression";
 import morgan from "morgan";
 import rootRouter from "./api/routes";
+import MongoDBConnectivity from "./api/app/db.app";
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to database
+const mongoDB = MongoDBConnectivity.getInstance();
+await mongoDB.connect();
 
 // Handle router
 app.use(rootRouter);
