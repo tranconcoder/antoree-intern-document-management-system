@@ -3,6 +3,6 @@ import apiRouter from "./api.route";
 
 const rootRouter = Router();
 
-rootRouter.use("/v1/api", apiRouter);
+rootRouter.use("/api", apiRouter);
 
 export default rootRouter;

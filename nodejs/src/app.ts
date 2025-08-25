@@ -8,6 +8,7 @@ import cors from "cors";
 
 import rootRouter from "./api/routes";
 import MongoDBConnectivity from "./api/app/db.app";
+import { APP_VERSION } from "@/configs/app.config";
 
 const app = express();
 
@@ -33,6 +34,6 @@ const mongoDB = MongoDBConnectivity.getInstance();
 await mongoDB.connect();
 
 // Handle router
-app.use(rootRouter);
+app.use(`/v${APP_VERSION}`, rootRouter);
 
 export default app;
