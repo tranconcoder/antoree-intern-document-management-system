@@ -2,7 +2,7 @@ import bcrypt from "bcrypt";
 import { errorResponses } from "@/constants/error.constant";
 import ErrorResponse from "@/core/error.core";
 import userModel from "@/models/user.model";
-import { SALT_ROUNDS } from "@/config/security.config";
+import { SALT_ROUNDS } from "@/configs/security.config";
 import type {
   LoginUserInput,
   RegisterUserInput,

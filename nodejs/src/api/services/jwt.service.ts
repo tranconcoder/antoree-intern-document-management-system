@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import type { SignOptions } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
-import { JWT_CONFIG } from "../config/jwt.config";
+import { JWT_CONFIG } from "../configs/jwt.config";
 import type { JwtSignPayload } from "@/types/jwt";
 
 export class JwtService {
