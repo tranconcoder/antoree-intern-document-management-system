@@ -1,3 +1,4 @@
+import { User } from "@/types/user";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // Define a type for the slice state
@@ -7,13 +8,15 @@ interface Tokens {
 }
 
 interface UserState {
-  user: Record<string, any> | null;
+  user: User | null;
   tokens: Tokens | null;
+  isLoggedIn: boolean;
 }
 
 const initialState: UserState = {
   user: null,
   tokens: null,
+  isLoggedIn: false,
 };
 
 const userSlice = createSlice({
@@ -25,7 +28,7 @@ const userSlice = createSlice({
      */
     setCredentials(
       state,
-      action: PayloadAction<{ user: Record<string, any>; tokens: Tokens }>
+      action: PayloadAction<{ user: User; tokens: Tokens }>
     ) {
       state.user = action.payload.user;
       state.tokens = action.payload.tokens;

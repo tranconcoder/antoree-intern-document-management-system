@@ -55,8 +55,10 @@ export default class AuthService {
       jti
     );
 
+    const { user_password, ...userInfo } = newUser;
+
     return {
-      user: newUser,
+      user: userInfo,
       tokens: { accessToken, refreshToken },
     };
   }
@@ -90,7 +92,9 @@ export default class AuthService {
     // Store key token with public key and jti
     await KeyTokenService.createKeyToken(user._id.toString(), publicKey, jti);
 
-    return { user, tokens: { accessToken, refreshToken } };
+    const { user_password, ...userInfo } = user;
+
+    return { user: userInfo, tokens: { accessToken, refreshToken } };
   }
 
   public static async refreshToken(

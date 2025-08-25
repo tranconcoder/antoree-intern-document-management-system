@@ -1,7 +1,7 @@
 import type { User } from "@/models/user.model";
 
 export interface RegisterResponse {
-  user: User;
+  user: Omit<User, "user_password">;
   tokens: {
     accessToken: string;
     refreshToken: string;
