@@ -9,9 +9,14 @@ const errorHandler: ErrorRequestHandler = (
   next
 ) => {
   if (err instanceof Error) {
-    err = new ErrorResponse(errorResponses.INTERNAL_SERVER_ERROR, err.message);
+    err = new ErrorResponse({
+      errorResponseItem: errorResponses.INTERNAL_SERVER_ERROR,
+      detail: err.message,
+    });
   } else if (!(err instanceof ErrorResponse)) {
-    err = new ErrorResponse(errorResponses.INTERNAL_SERVER_ERROR);
+    err = new ErrorResponse({
+      errorResponseItem: errorResponses.INTERNAL_SERVER_ERROR,
+    });
   }
 
   console.log(err.errorMessage);

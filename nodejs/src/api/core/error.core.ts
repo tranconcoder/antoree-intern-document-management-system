@@ -1,12 +1,12 @@
-import type { ErrorResponseItem } from "@/types/error";
+import type { ErrorResponseItem, ErrorResponseConfig } from "@/types/error";
 
 export default class ErrorResponse {
   private errorResponseItem: ErrorResponseItem;
   private detail?: string;
 
-  public constructor(errorResponseItem: ErrorResponseItem, detail?: string) {
-    this.errorResponseItem = errorResponseItem;
-    this.detail = detail;
+  public constructor(config: ErrorResponseConfig) {
+    this.errorResponseItem = config.errorResponseItem;
+    this.detail = config.detail;
   }
 
   //   Get error message handler
