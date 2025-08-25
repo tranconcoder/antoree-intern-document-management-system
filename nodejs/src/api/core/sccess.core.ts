@@ -1,5 +1,5 @@
 import type { SuccessResponseItem, SuccessResponseConfig } from "@/types/error";
-import type { Request, Response } from "express";
+import type { Response } from "express";
 
 export default class SuccessResponse {
   private successResponseItem: SuccessResponseItem;
