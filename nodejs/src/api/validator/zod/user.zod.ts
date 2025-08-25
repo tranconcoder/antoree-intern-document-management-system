@@ -32,11 +32,6 @@ export const registerUserSchema = z.object({
         return new Date(n);
       })
   ),
-
-  user_premiumTicket: z
-    .string()
-    .regex(/^[0-9a-fA-F]{24}$/, { message: "Invalid ObjectId" })
-    .optional(),
 });
 
 export type RegisterUserInput = z.infer<typeof registerUserSchema>;
