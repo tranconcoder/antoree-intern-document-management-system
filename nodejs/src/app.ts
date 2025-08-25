@@ -4,6 +4,8 @@ import express from "express";
 import helmet from "helmet";
 import compression from "compression";
 import morgan from "morgan";
+import cors from "cors";
+
 import rootRouter from "./api/routes";
 import MongoDBConnectivity from "./api/app/db.app";
 
@@ -13,6 +15,14 @@ const app = express();
 app.use(morgan("dev"));
 app.use(helmet());
 app.use(compression());
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true,
+    exposedHeaders: ["Content-Disposition"],
+  })
+);
 
 // Express middleware
 app.use(express.json());
