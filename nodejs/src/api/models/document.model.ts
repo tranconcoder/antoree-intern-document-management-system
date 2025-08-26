@@ -3,10 +3,24 @@ import {
   DOCUMENT_DOCUMENT_NAME,
 } from "@/constants/mongoose.constant";
 import { TIME_STAMPS } from "@/constants/schema.constant";
-import { FileType, getAllFileTypes } from "@/enums/fileType.enum";
+import { getAllFileTypes } from "@/enums/fileType.enum";
+import type { TimeStamps } from "@/types/schema";
 import { model, Schema } from "mongoose";
 
-const documentSchema = new Schema(
+export interface Document extends TimeStamps {
+  title: string;
+  description: string;
+
+  fileContentType: string;
+  fileBytes: Buffer;
+  fileSize: number;
+  fileName: string;
+
+  isPremium: boolean;
+  isPublic: boolean;
+}
+
+const documentSchema = new Schema<Document>(
   {
     // Metadata
     title: { type: String, required: true, min: 10, max: 200 },
