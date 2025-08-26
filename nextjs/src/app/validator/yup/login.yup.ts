@@ -10,3 +10,8 @@ export const loginSchema = yup.object({
     .required("Password is required")
     .min(6, "Password must be at least 6 characters"),
 });
+
+export type LoginFormValues = {
+  user_email: string;
+  user_password: string;
+};

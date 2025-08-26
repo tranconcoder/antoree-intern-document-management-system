@@ -1,15 +1,16 @@
 import type { TimeStamps } from "@/types/schema";
 import mongoose, { Schema } from "mongoose";
-import { USER_DOCUMENT_NAME } from "./user.model";
 import {
   PremiumTicketStatus,
   PremiumTicketTime,
   PREMIUM_TICKET_STATUSES,
   PREMIUM_TICKET_TIMES,
 } from "../enums/premiumTicket.enum";
-
-export const PREMIUM_TICKET_COLLECTION_NAME = "premium_tickets";
-export const PREMIUM_TICKET_DOCUMENT_NAME = "PremiumTicket";
+import {
+  PREMIUM_TICKET_COLLECTION_NAME,
+  PREMIUM_TICKET_DOCUMENT_NAME,
+  USER_DOCUMENT_NAME,
+} from "@/constants/mongoose.constant";
 
 export interface PremiumTicket extends TimeStamps {
   id: string;

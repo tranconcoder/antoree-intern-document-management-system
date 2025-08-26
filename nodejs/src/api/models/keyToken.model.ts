@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import { USER_DOCUMENT_NAME } from "./user.model";
+import { USER_DOCUMENT_NAME } from "@/constants/mongoose.constant";
 import { TIME_STAMPS } from "@/constants/schema.constant";
 import type { TimeStamps } from "@/types/schema";
 

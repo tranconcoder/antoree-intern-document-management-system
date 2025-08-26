@@ -1,10 +1,11 @@
+import {
+  PREMIUM_TICKET_DOCUMENT_NAME,
+  USER_COLLECTION_NAME,
+  USER_DOCUMENT_NAME,
+} from "@/constants/mongoose.constant";
 import { TIME_STAMPS } from "@/constants/schema.constant";
 import type { TimeStamps } from "@/types/schema";
 import mongoose, { Schema } from "mongoose";
-import { PREMIUM_TICKET_DOCUMENT_NAME } from "./premiumTicket.model";
-
-export const USER_COLLECTION_NAME = "users";
-export const USER_DOCUMENT_NAME = "User";
 
 export interface User extends TimeStamps {
   id: string;

@@ -1,14 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Formik, Form } from "formik";
 import {
   registerSchema,
   type RegisterFormValues,
 } from "@/app/validator/yup/register.yup";
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/store/hooks";
-import { setCredentials } from "@/store/slices/user.slice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchRegister } from "@/store/thunks/user.thunk";
+import { clearError } from "@/store/slices/user.slice";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
@@ -17,6 +18,9 @@ import { Button } from "@/components/ui/Button";
 export default function RegisterPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { isLoading, isLoggedIn, errorMessage } = useAppSelector(
+    (state) => state.user
+  );
 
   const initialValues: RegisterFormValues = {
     user_email: "",
@@ -33,49 +37,56 @@ export default function RegisterPage() {
     { value: true, label: "Nữ" },
   ];
 
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push("/");
+    }
+  }, [isLoggedIn, router]);
+
+  // Clear error when component mounts
+  useEffect(() => {
+    if (errorMessage) {
+      dispatch(clearError());
+    }
+  }, []);
+
   const onSubmit = async (
     values: RegisterFormValues,
-    { setSubmitting, setFieldError }: any
+    { setSubmitting, setFieldError, setStatus }: any
   ) => {
     try {
-      setSubmitting(true);
+      // Clear any previous errors
+      setStatus(null);
+      dispatch(clearError());
 
-      // Convert date to Unix timestamp (seconds)
-      const payload = {
-        ...values,
+      // Convert date to Unix timestamp and prepare payload
+      const payloadForApi = {
+        user_email: values.user_email,
+        user_password: values.user_password,
+        user_firstName: values.user_firstName,
+        user_lastName: values.user_lastName,
+        user_gender: values.user_gender,
         user_dayOfBirth: Math.floor(values.user_dayOfBirth.getTime() / 1000),
-        // Remove confirmPassword from payload
-        confirmPassword: undefined,
       };
 
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      // Dispatch register thunk
+      const result = await dispatch(fetchRegister(payloadForApi as any));
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        // Handle validation errors
-        if (data.errors) {
-          Object.keys(data.errors).forEach((field) => {
-            setFieldError(field, data.errors[field]);
-          });
-        } else {
-          setFieldError("user_email", data?.message || "Đăng ký thất bại");
-        }
-        setSubmitting(false);
-        return;
+      if (fetchRegister.fulfilled.match(result)) {
+        // Registration successful - redirect will happen via useEffect
+        console.log("Registration successful");
+      } else if (fetchRegister.rejected.match(result)) {
+        // Registration failed - error is already in store, but also set form error
+        const errorMsg = result.error.message || "Đăng ký thất bại";
+        setFieldError("user_email", errorMsg);
+        setStatus({ error: errorMsg });
       }
-
-      // Successful registration - dispatch credentials to store
-      dispatch(setCredentials({ user: data.user, tokens: data.tokens }));
-
-      // Redirect to home
-      router.push("/");
-    } catch (err) {
-      setFieldError("user_email", "Đã xảy ra lỗi không mong muốn");
+    } catch (error: any) {
+      console.error("Register error:", error);
+      const errorMsg = "Đã xảy ra lỗi không mong muốn";
+      setFieldError("user_email", errorMsg);
+      setStatus({ error: errorMsg });
     } finally {
       setSubmitting(false);
     }
@@ -83,13 +94,42 @@ export default function RegisterPage() {
 
   return (
     <div className="w-full">
+      {/* Show global error message from store */}
+      {errorMessage && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-red-600">{errorMessage}</p>
+            <button
+              onClick={() => dispatch(clearError())}
+              className="text-red-400 hover:text-red-600 ml-2"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Show loading state */}
+      {isLoading && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+          <p className="text-sm text-blue-600">Đang xử lý đăng ký...</p>
+        </div>
+      )}
+
       <Formik
         initialValues={initialValues}
         validationSchema={registerSchema}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, status }) => (
           <Form className="space-y-4">
+            {/* Show form-level error */}
+            {status?.error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                <p className="text-sm text-red-600">{status.error}</p>
+              </div>
+            )}
+
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -97,12 +137,14 @@ export default function RegisterPage() {
                 name="user_firstName"
                 label="Họ"
                 type="text"
+                disabled={isLoading}
               />
               <Input
                 id="user_lastName"
                 name="user_lastName"
                 label="Tên"
                 type="text"
+                disabled={isLoading}
               />
             </div>
 
@@ -112,6 +154,7 @@ export default function RegisterPage() {
               name="user_email"
               label="Email"
               type="email"
+              disabled={isLoading}
             />
 
             {/* Password Fields */}
@@ -120,6 +163,7 @@ export default function RegisterPage() {
               name="user_password"
               label="Mật khẩu"
               type="password"
+              disabled={isLoading}
             />
 
             <Input
@@ -127,6 +171,7 @@ export default function RegisterPage() {
               name="confirmPassword"
               label="Xác nhận mật khẩu"
               type="password"
+              disabled={isLoading}
             />
 
             {/* Gender and Date of Birth */}
@@ -149,12 +194,12 @@ export default function RegisterPage() {
             <div className="pt-4">
               <Button
                 type="submit"
-                disabled={isSubmitting}
-                isLoading={isSubmitting}
+                disabled={isSubmitting || isLoading}
+                isLoading={isSubmitting || isLoading}
                 className="w-full"
                 size="lg"
               >
-                Đăng ký
+                {isLoading ? "Đang đăng ký..." : "Đăng ký"}
               </Button>
             </div>
           </Form>

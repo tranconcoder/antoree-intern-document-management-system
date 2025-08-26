@@ -1,11 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Formik, Form } from "formik";
 import { loginSchema } from "@/app/validator/yup/login.yup";
 import { useRouter } from "next/navigation";
-import { useAppDispatch } from "@/store/hooks";
-import { setCredentials } from "@/store/slices/user.slice";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { fetchLogin } from "@/store/thunks/user.thunk";
+import { clearError } from "@/store/slices/user.slice";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
@@ -17,56 +18,67 @@ type FormValues = {
 export default function LoginPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
+  const { isLoading, isLoggedIn, errorMessage } = useAppSelector(
+    (state) => state.user
+  );
 
   const initialValues: FormValues = {
     user_email: "",
     user_password: "",
   };
 
-  // Validation handled by Yup schema (loginSchema)
+  // Redirect if already logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      router.push("/");
+    }
+  }, [isLoggedIn, router]);
+
+  // Clear error when component mounts
+  useEffect(() => {
+    if (errorMessage) {
+      dispatch(clearError());
+    }
+  }, []);
 
   const onSubmit = async (
     values: FormValues,
-    { setSubmitting, setFieldError }: any
+    { setSubmitting, setFieldError, setStatus }: any
   ) => {
-    try {
-      setSubmitting(true);
-
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        // show simple field error or generic
-        setFieldError("user_email", data?.message || "Login failed");
-        setSubmitting(false);
-        return;
-      }
-
-      // dispatch credentials to store
-      dispatch(setCredentials({ user: data.user, tokens: data.tokens }));
-
-      // redirect to home
-      router.push("/");
-    } catch (err) {
-      // generic error handling
-      setFieldError("user_email", "An unexpected error occurred");
-    } finally {
-      setSubmitting(false);
-    }
+    // Dispatch login thunk
+    await dispatch(fetchLogin(values));
   };
 
   return (
     <div className="w-full">
+      {/* Show global error message from store */}
+      {errorMessage && (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+          <div className="flex justify-between items-center">
+            <p className="text-sm text-red-600">{errorMessage}</p>
+            <button
+              onClick={() => dispatch(clearError())}
+              className="text-red-400 hover:text-red-600 ml-2"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Show loading state */}
+      {isLoading && (
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
+          <span>Đang xử lý đăng nhập...</span>
+        </div>
+      )}
+
       <Formik
         initialValues={initialValues}
         validationSchema={loginSchema}
         onSubmit={onSubmit}
       >
-        {({ isSubmitting }) => (
+        {({ isSubmitting, status }) => (
           <Form className="space-y-4">
             {/* Email Field */}
             <Input
@@ -74,6 +86,7 @@ export default function LoginPage() {
               name="user_email"
               label="Email"
               type="email"
+              disabled={isLoading}
             />
 
             {/* Password Field */}
@@ -82,18 +95,19 @@ export default function LoginPage() {
               name="user_password"
               label="Mật khẩu"
               type="password"
+              disabled={isLoading}
             />
 
             {/* Submit Button */}
             <div className="pt-4">
               <Button
                 type="submit"
-                disabled={isSubmitting}
-                isLoading={isSubmitting}
+                disabled={isSubmitting || isLoading}
+                isLoading={isSubmitting || isLoading}
                 className="w-full"
                 size="lg"
               >
-                Đăng nhập
+                {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
             </div>
           </Form>

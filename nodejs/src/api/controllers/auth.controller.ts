@@ -18,13 +18,13 @@ export default class AuthController {
     }).sendResponse(res);
   };
 
-  public login: Handler = (req, res, next) => {
+  public login: Handler = async (req, res, next) => {
     const loginPayload = req.body as LoginUserInput;
 
     new SuccessResponse({
       detail: "User logged in successfully",
       successResponseItem: successResponses.AUTH_LOGIN_SUCCESS,
-      metadata: AuthService.login(loginPayload),
+      metadata: await AuthService.login(loginPayload),
     }).sendResponse(res);
   };
 }

@@ -10,6 +10,7 @@ interface InputProps {
   label: string;
   placeholder?: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export const Input: React.FC<InputProps> = ({
@@ -19,6 +20,7 @@ export const Input: React.FC<InputProps> = ({
   label,
   placeholder = " ",
   className = "",
+  disabled = false,
 }) => {
   return (
     <div className="relative">
@@ -30,7 +32,10 @@ export const Input: React.FC<InputProps> = ({
               id={id}
               type={type}
               placeholder={placeholder}
-              className={`peer w-full px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:border-emerald-600 focus:outline-none ${className}`}
+              disabled={disabled}
+              className={`peer w-full px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:border-emerald-600 focus:outline-none ${
+                disabled ? "opacity-50 cursor-not-allowed" : ""
+              } ${className}`}
             />
             <label
               htmlFor={id}

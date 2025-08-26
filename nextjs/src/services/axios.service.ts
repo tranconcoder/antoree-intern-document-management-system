@@ -1,7 +1,7 @@
-import axios, { AxiosResponse, InternalAxiosRequestConfig } from "axios";
+import axios, { AxiosError, AxiosHeaders, AxiosRequestConfig } from "axios";
 import { AXIOS_URL } from "@/configs/axios.config";
+import { RefreshTokenResponse } from "@/types/response";
 
-// Create axios instance
 const axiosInstance = axios.create({
   baseURL: AXIOS_URL,
   headers: {
@@ -9,150 +9,119 @@ const axiosInstance = axios.create({
   },
 });
 
-// Flag để tránh multiple refresh requests
+// Separate instance for token refresh to avoid interceptor recursion
+const refreshClient = axios.create({
+  baseURL: AXIOS_URL,
+  headers: { "Content-Type": "application/json" },
+});
+
+// Normalize headers to AxiosHeaders without unsafe casts
+const toAxiosHeaders = (headers: unknown): AxiosHeaders => {
+  if (headers instanceof AxiosHeaders) return headers;
+  const ax = new AxiosHeaders();
+  if (headers && typeof headers === "object") {
+    for (const [k, v] of Object.entries(headers as Record<string, unknown>)) {
+      ax.set(k, v as string);
+    }
+  }
+  return ax;
+};
+
+// Concurrency control for refresh flow
 let isRefreshing = false;
-let failedQueue: Array<{
-  resolve: (value: any) => void;
-  reject: (error: any) => void;
-}> = [];
+let refreshPromise: Promise<RefreshTokenResponse> | null = null;
 
-// Function để xử lý failed queue
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach(({ resolve, reject }) => {
-    if (error) {
-      reject(error);
-    } else {
-      resolve(token);
-    }
-  });
+type RetriableConfig = AxiosRequestConfig & { _retry?: boolean };
 
-  failedQueue = [];
-};
-
-// Function để lấy tokens từ localStorage
-const getTokensFromStorage = () => {
-  try {
-    const tokens = localStorage.getItem("tokens");
-    return tokens ? JSON.parse(tokens) : null;
-  } catch {
-    return null;
-  }
-};
-
-// Function để lưu tokens vào localStorage
-const saveTokensToStorage = (tokens: any) => {
-  try {
-    localStorage.setItem("tokens", JSON.stringify(tokens));
-  } catch (error) {
-    console.error("Error saving tokens to localStorage:", error);
-  }
-};
-
-// Function để xóa tokens khỏi localStorage
-const clearTokensFromStorage = () => {
-  try {
-    localStorage.removeItem("tokens");
-  } catch (error) {
-    console.error("Error clearing tokens from localStorage:", error);
-  }
-};
-
-// Function để refresh access token
-const refreshAccessToken = async (): Promise<string | null> => {
-  try {
-    const tokens = getTokensFromStorage();
-    if (!tokens?.refreshToken) {
-      throw new Error("No refresh token available");
-    }
-
-    const response = await axios.post(`${AXIOS_URL}/auth/refresh`, {
-      refreshToken: tokens.refreshToken,
-    });
-
-    const newTokens = response.data.tokens;
-    saveTokensToStorage(newTokens);
-
-    return newTokens.accessToken;
-  } catch (error) {
-    console.error("Error refreshing token:", error);
-    clearTokensFromStorage();
-
-    // Redirect to login page
-    if (typeof window !== "undefined") {
-      window.location.href = "/auth/login";
-    }
-
-    return null;
-  }
-};
-
-// Request interceptor để đính kèm access token
 axiosInstance.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const tokens = getTokensFromStorage();
+  (config) => {
+    const accessToken =
+      typeof window !== "undefined"
+        ? localStorage.getItem("accessToken")
+        : null;
 
-    if (tokens?.accessToken) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${tokens.accessToken}`;
+    if (accessToken) {
+      const headers = toAxiosHeaders(config.headers);
+      headers.set("Authorization", `Bearer ${accessToken}`);
+      config.headers = headers;
     }
 
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
-// Response interceptor để xử lý refresh token
 axiosInstance.interceptors.response.use(
-  (response: AxiosResponse) => {
+  (response) => {
+    // Handle successful responses
     return response;
   },
-  async (error) => {
-    const originalRequest = error.config;
+  async (error: AxiosError) => {
+    const status = error.response?.status;
+    const originalRequest = (error.config || {}) as RetriableConfig;
 
-    // Kiểm tra nếu là lỗi 401 (Unauthorized) và chưa retry
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      // Nếu đang trong quá trình refresh, thêm request vào queue
-      if (isRefreshing) {
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
-            return axiosInstance(originalRequest);
-          })
-          .catch((err) => {
-            return Promise.reject(err);
-          });
+    // Do not attempt to refresh for the refresh endpoint itself
+    const isRefreshCall = (originalRequest?.url || "").includes(
+      "/auth/refresh-token"
+    );
+
+    if (status === 401 && !isRefreshCall) {
+      const refreshToken =
+        typeof window !== "undefined"
+          ? localStorage.getItem("refreshToken")
+          : null;
+      if (!refreshToken) {
+        // No refresh token -> clear and reject
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+        }
+        return Promise.reject(error);
       }
 
+      if (originalRequest._retry) {
+        // Already retried once, avoid loops
+        return Promise.reject(error);
+      }
       originalRequest._retry = true;
-      isRefreshing = true;
 
       try {
-        const newAccessToken = await refreshAccessToken();
-
-        if (newAccessToken) {
-          // Update header cho original request
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-
-          // Process queue với new token
-          processQueue(null, newAccessToken);
-
-          // Retry original request
-          return axiosInstance(originalRequest);
-        } else {
-          // Refresh failed, process queue với error
-          processQueue(error, null);
-          return Promise.reject(error);
+        if (!isRefreshing) {
+          isRefreshing = true;
+          refreshPromise = refreshClient
+            .post<RefreshTokenResponse>("/auth/refresh-token", {
+              refreshToken,
+            })
+            .then((res) => res.data)
+            .then((tokens) => {
+              if (typeof window !== "undefined") {
+                localStorage.setItem("accessToken", tokens.accessToken);
+                localStorage.setItem("refreshToken", tokens.refreshToken);
+              }
+              return tokens;
+            })
+            .catch((refreshErr) => {
+              // On failure, clear auth and propagate
+              if (typeof window !== "undefined") {
+                localStorage.removeItem("accessToken");
+                localStorage.removeItem("refreshToken");
+              }
+              throw refreshErr;
+            })
+            .finally(() => {
+              isRefreshing = false;
+            });
         }
+
+        // Wait for refresh to resolve and then retry the original request
+        const tokens = await (refreshPromise as Promise<RefreshTokenResponse>);
+
+        const headers = toAxiosHeaders(originalRequest.headers);
+        headers.set("Authorization", `Bearer ${tokens.accessToken}`);
+        originalRequest.headers = headers;
+        return axiosInstance(originalRequest);
       } catch (refreshError) {
-        // Refresh failed, process queue với error
-        processQueue(refreshError, null);
         return Promise.reject(refreshError);
-      } finally {
-        isRefreshing = false;
       }
     }
 
