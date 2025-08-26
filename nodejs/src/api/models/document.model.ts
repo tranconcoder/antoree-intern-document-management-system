@@ -10,6 +10,7 @@ import { model, Schema } from "mongoose";
 export interface Document extends TimeStamps {
   title: string;
   description: string;
+  previewAvatar: Buffer;
 
   fileContentType: string;
   fileBytes: Buffer;
@@ -25,6 +26,7 @@ const documentSchema = new Schema<Document>(
     // Metadata
     title: { type: String, required: true, min: 10, max: 200 },
     description: { type: String, required: true, min: 20, max: 1000 },
+    previewAvatar: { type: Buffer, required: false },
 
     // File information
     fileContentType: {
