@@ -19,20 +19,21 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    "font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2";
+    "font-semibold rounded-xl transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-blue-500/30 transform active:scale-95";
 
   const variantClasses = {
     primary:
-      "bg-emerald-600 text-white hover:bg-emerald-700 disabled:bg-emerald-400",
-    secondary: "bg-gray-600 text-white hover:bg-gray-700 disabled:bg-gray-400",
+      "bg-gradient-to-r from-blue-500 to-blue-700 text-white hover:from-blue-600 hover:to-blue-800 shadow-lg hover:shadow-xl disabled:from-blue-300 disabled:to-blue-400 disabled:shadow-none",
+    secondary:
+      "bg-gradient-to-r from-gray-500 to-gray-700 text-white hover:from-gray-600 hover:to-gray-800 shadow-lg hover:shadow-xl disabled:from-gray-300 disabled:to-gray-400 disabled:shadow-none",
     outline:
-      "border-2 border-emerald-600 text-emerald-600 hover:bg-emerald-50 disabled:border-emerald-400 disabled:text-emerald-400",
+      "border-2 border-blue-500 text-blue-600 hover:bg-blue-50 hover:border-blue-600 disabled:border-blue-300 disabled:text-blue-300 disabled:hover:bg-transparent",
   };
 
   const sizeClasses = {
-    sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-base",
-    lg: "px-6 py-3 text-lg",
+    sm: "px-4 py-2 text-sm",
+    md: "px-6 py-3 text-base",
+    lg: "px-8 py-4 text-lg",
   };
 
   const isDisabled = disabled || isLoading;
@@ -41,12 +42,18 @@ export const Button: React.FC<ButtonProps> = ({
     <button
       {...props}
       disabled={isDisabled}
-      className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
+      className={`${baseClasses} ${variantClasses[variant]} ${
+        sizeClasses[size]
+      } ${
+        isDisabled
+          ? "opacity-70 cursor-not-allowed transform-none"
+          : "hover:scale-105"
+      } ${className}`}
     >
       {isLoading ? (
         <div className="flex items-center justify-center">
           <svg
-            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+            className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -65,7 +72,7 @@ export const Button: React.FC<ButtonProps> = ({
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          Loading...
+          <span>Đang xử lý...</span>
         </div>
       ) : (
         children

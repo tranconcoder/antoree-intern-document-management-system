@@ -72,23 +72,16 @@ export default function RegisterPage() {
     <div className="w-full">
       {/* Show global error message from store */}
       {errorMessage && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
           <div className="flex justify-between items-center">
             <p className="text-sm text-red-600">{errorMessage}</p>
             <button
               onClick={() => dispatch(clearError())}
-              className="text-red-400 hover:text-red-600 ml-2"
+              className="text-red-400 hover:text-red-600 ml-2 w-5 h-5 flex items-center justify-center"
             >
               ✕
             </button>
           </div>
-        </div>
-      )}
-
-      {/* Show loading state */}
-      {isLoading && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-          <span>Đang xử lý đăng ký...</span>
         </div>
       )}
 
@@ -98,13 +91,13 @@ export default function RegisterPage() {
         onSubmit={onSubmit}
       >
         {({ isSubmitting, status }) => (
-          <Form className="space-y-4">
+          <Form className="space-y-6">
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
               <Input
                 id="user_firstName"
                 name="user_firstName"
-                label="Họ"
+                label="Họ và tên đệm"
                 type="text"
                 disabled={isLoading}
               />
@@ -121,7 +114,7 @@ export default function RegisterPage() {
             <Input
               id="user_email"
               name="user_email"
-              label="Email"
+              label="Địa chỉ email"
               type="email"
               disabled={isLoading}
             />
@@ -162,7 +155,7 @@ export default function RegisterPage() {
             </div>
 
             {/* Submit Button */}
-            <div className="pt-4">
+            <div className="pt-2">
               <Button
                 type="submit"
                 disabled={isSubmitting || isLoading}
@@ -170,17 +163,17 @@ export default function RegisterPage() {
                 className="w-full"
                 size="lg"
               >
-                {isLoading ? "Đang đăng ký..." : "Đăng ký"}
+                Tạo tài khoản
               </Button>
             </div>
 
             {/* Login Link */}
-            <div className="text-center pt-4">
-              <p className="text-sm text-gray-600">
+            <div className="text-center pt-4 border-t border-gray-100">
+              <p className="text-sm text-gray-600 mt-4">
                 Đã có tài khoản?{" "}
                 <Link
                   href="/auth/login"
-                  className="text-emerald-600 hover:text-emerald-700 font-medium"
+                  className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-300"
                 >
                   Đăng nhập ngay
                 </Link>

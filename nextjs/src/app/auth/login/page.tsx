@@ -51,23 +51,16 @@ export default function LoginPage() {
     <div className="w-full">
       {/* Show global error message from store */}
       {errorMessage && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
           <div className="flex justify-between items-center">
             <p className="text-sm text-red-600">{errorMessage}</p>
             <button
               onClick={() => dispatch(clearError())}
-              className="text-red-400 hover:text-red-600 ml-2"
+              className="text-red-400 hover:text-red-600 ml-2 w-5 h-5 flex items-center justify-center"
             >
               ✕
             </button>
           </div>
-        </div>
-      )}
-
-      {/* Show loading state */}
-      {isLoading && (
-        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-          <span>Đang xử lý đăng nhập...</span>
         </div>
       )}
 
@@ -77,12 +70,12 @@ export default function LoginPage() {
         onSubmit={onSubmit}
       >
         {({ isSubmitting, status }) => (
-          <Form className="space-y-4">
+          <Form className="space-y-6">
             {/* Email Field */}
             <Input
               id="user_email"
               name="user_email"
-              label="Email"
+              label="Địa chỉ email"
               type="email"
               disabled={isLoading}
             />
@@ -96,8 +89,18 @@ export default function LoginPage() {
               disabled={isLoading}
             />
 
+            {/* Forgot Password Link */}
+            <div className="flex justify-end">
+              <Link
+                href="/auth/forgot-password"
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium transition-colors duration-300"
+              >
+                Quên mật khẩu?
+              </Link>
+            </div>
+
             {/* Submit Button */}
-            <div className="pt-4">
+            <div className="pt-2">
               <Button
                 type="submit"
                 disabled={isSubmitting || isLoading}
@@ -105,19 +108,19 @@ export default function LoginPage() {
                 className="w-full"
                 size="lg"
               >
-                {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
+                Đăng nhập
               </Button>
             </div>
 
             {/* Register Link */}
-            <div className="text-center pt-4">
-              <p className="text-sm text-gray-600">
+            <div className="text-center pt-4 border-t border-gray-100">
+              <p className="text-sm text-gray-600 mt-4">
                 Chưa có tài khoản?{" "}
                 <Link
                   href="/auth/register"
-                  className="text-emerald-600 hover:text-emerald-700 font-medium"
+                  className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-300"
                 >
-                  Đăng ký ngay
+                  Đăng ký miễn phí
                 </Link>
               </p>
             </div>

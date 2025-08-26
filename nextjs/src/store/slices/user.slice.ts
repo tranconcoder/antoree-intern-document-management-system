@@ -64,12 +64,17 @@ const userSlice = createSlice({
           if (persistedUser.tokens && persistedUser.user) {
             state.user = persistedUser.user;
             state.tokens = persistedUser.tokens;
+
             state.isLoggedIn = true;
+            state.isLoading = false;
             state.errorMessage = "";
           }
         }
       })
+
+      //
       // Login cases
+      //
       .addCase(fetchLogin.pending, (state) => {
         state.isLoading = true;
         state.errorMessage = "";
@@ -93,7 +98,9 @@ const userSlice = createSlice({
         state.errorMessage = action.error.message || "Đăng nhập thất bại";
       })
 
+      //
       // Register cases
+      //
       .addCase(fetchRegister.pending, (state) => {
         state.isLoading = true;
         state.errorMessage = "";
@@ -117,10 +124,13 @@ const userSlice = createSlice({
         state.errorMessage = action.error.message || "Đăng ký thất bại";
       })
 
+      //
       // Logout cases
+      //
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
         state.tokens = null;
+
         state.isLoggedIn = false;
         state.errorMessage = "";
       });

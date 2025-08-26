@@ -2,6 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { IoDocumentText, IoArrowBack } from "react-icons/io5";
 
 export default function AuthLayout({
   children,
@@ -12,47 +13,64 @@ export default function AuthLayout({
   const isLogin = pathname === "/auth/login";
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 flex items-center justify-center p-4">
+      {/* Background Pattern */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-blue-100/50"></div>
+
+      {/* Back Button */}
       <Link
         href="/"
-        className="absolute top-4 left-4 text-emerald-600 hover:underline"
+        className="absolute top-6 left-6 flex items-center space-x-2 text-blue-600 hover:text-blue-700 transition-colors duration-300 z-10"
       >
-        ← Back
+        <IoArrowBack className="w-5 h-5" />
+        <span className="font-medium">Về trang chủ</span>
       </Link>
 
-      <div className="bg-white text-gray-900 rounded-2xl shadow-lg border border-gray-200 w-full max-w-md p-8">
-        <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold text-emerald-600">Welcome</h1>
-          <p className="text-sm text-emerald-500">
-            Please login or register to continue
+      {/* Main Auth Container */}
+      <div
+        className={`relative bg-white/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 w-full max-w-md ${
+          isLogin ? "p-8" : "p-8 max-h-[90vh] overflow-y-auto custom-scrollbar"
+        }`}
+      >
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
+              <IoDocumentText className="w-8 h-8 text-white" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Doc Manager</h1>
+          <p className="text-gray-600">
+            {isLogin ? "Chào mừng bạn quay trở lại" : "Tạo tài khoản mới"}
           </p>
         </div>
 
-        {/* Tab navigation */}
-        <div className="flex mb-6 bg-gray-50 rounded-lg p-1">
+        {/* Tab Navigation */}
+        <div className="flex mb-8 bg-gray-100 rounded-xl p-1 sticky top-0 z-10">
           <Link
             href="/auth/login"
-            className={`flex-1 py-2 px-4 text-center rounded-md transition-colors ${
+            className={`flex-1 py-3 px-4 text-center rounded-lg transition-all duration-300 font-medium ${
               isLogin
-                ? "bg-emerald-600 text-white"
-                : "text-emerald-600 hover:bg-emerald-50"
+                ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white shadow-lg transform scale-[0.98]"
+                : "text-blue-600 hover:bg-blue-50"
             }`}
           >
-            Login
+            Đăng nhập
           </Link>
           <Link
             href="/auth/register"
-            className={`flex-1 py-2 px-4 text-center rounded-md transition-colors ${
+            className={`flex-1 py-3 px-4 text-center rounded-lg transition-all duration-300 font-medium ${
               !isLogin
-                ? "bg-emerald-600 text-white"
-                : "text-emerald-600 hover:bg-emerald-50"
+                ? "bg-gradient-to-r from-blue-500 to-blue-700 text-white shadow-lg transform scale-[0.98]"
+                : "text-blue-600 hover:bg-blue-50"
             }`}
           >
-            Register
+            Đăng ký
           </Link>
         </div>
 
-        <div className="space-y-4">{children}</div>
+        {/* Form Content */}
+        <div className={isLogin ? "" : "pb-4"}>{children}</div>
       </div>
     </div>
   );

@@ -18,7 +18,7 @@ export const Input: React.FC<InputProps> = ({
   name,
   type = "text",
   label,
-  placeholder = " ",
+  placeholder = "",
   className = "",
   disabled = false,
 }) => {
@@ -33,16 +33,20 @@ export const Input: React.FC<InputProps> = ({
               type={type}
               placeholder={placeholder}
               disabled={disabled}
-              className={`peer w-full px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:border-emerald-600 focus:outline-none ${
-                disabled ? "opacity-50 cursor-not-allowed" : ""
+              className={`peer w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/50 backdrop-blur-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 ${
+                meta.touched && meta.error
+                  ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
+                  : ""
+              } ${
+                disabled ? "opacity-50 cursor-not-allowed bg-gray-100" : ""
               } ${className}`}
             />
             <label
               htmlFor={id}
-              className={`absolute left-3 text-sm transition-all pointer-events-none ${
+              className={`absolute left-4 transition-all duration-300 pointer-events-none ${
                 field.value || meta.touched
-                  ? "top-0 text-xs text-emerald-600"
-                  : "top-2 text-gray-500 peer-focus:top-0 peer-focus:text-xs peer-focus:text-emerald-600"
+                  ? "-top-2.5 text-xs text-blue-600 bg-white px-2 rounded"
+                  : "top-3.5 text-sm text-gray-500 peer-focus:-top-2.5 peer-focus:text-xs peer-focus:text-blue-600 peer-focus:bg-white peer-focus:px-2 peer-focus:rounded"
               }`}
             >
               {label}

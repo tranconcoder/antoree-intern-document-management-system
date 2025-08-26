@@ -1,4 +1,5 @@
-import { useAppSelector } from "@/store/hooks";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { logoutUser } from "@/store/thunks/user.thunk";
 import Link from "next/link";
 import { useState } from "react";
 import { BiLogOut } from "react-icons/bi";
@@ -9,8 +10,32 @@ import { IoSettingsSharp } from "react-icons/io5";
 export interface ProfileBoxProps {}
 
 export default function ProfileBox({}: ProfileBoxProps) {
+  const dispatch = useAppDispatch();
+
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+
   const user = useAppSelector((state) => state.user.user);
+  const isLoggedIn = useAppSelector((state) => state.user.isLoggedIn);
+  const userFullName = `${user?.user_firstName} ${user?.user_lastName}`;
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    setIsProfileOpen(false);
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <div className="flex items-center">
+        <Link
+          href="/auth/login"
+          className="flex items-center space-x-2 px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-500 to-blue-700 hover:from-blue-600 hover:to-blue-800 rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+        >
+          <HiUser className="w-4 h-4" />
+          <span>Đăng nhập</span>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="relative">
@@ -23,7 +48,7 @@ export default function ProfileBox({}: ProfileBoxProps) {
         </div>
         <div className="hidden md:block text-left">
           <div className="text-sm font-semibold text-gray-800">
-            {user?.user_firstName} {user?.user_lastName}
+            {userFullName}
           </div>
           <div className="text-xs text-gray-500">{user?.user_email}</div>
         </div>
@@ -55,9 +80,11 @@ export default function ProfileBox({}: ProfileBoxProps) {
                 </div>
                 <div>
                   <div className="text-sm font-semibold text-gray-800">
-                    John Doe
+                    {userFullName}
                   </div>
-                  <div className="text-xs text-gray-500">john@example.com</div>
+                  <div className="text-xs text-gray-500">
+                    {user?.user_email}
+                  </div>
                 </div>
               </div>
             </div>
@@ -83,10 +110,7 @@ export default function ProfileBox({}: ProfileBoxProps) {
             <hr className="my-2 border-gray-100" />
 
             <button
-              onClick={() => {
-                // Handle logout
-                setIsProfileOpen(false);
-              }}
+              onClick={handleLogout}
               className="flex items-center w-full px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
             >
               <BiLogOut className="w-4 h-4 mr-3" />

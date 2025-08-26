@@ -36,15 +36,15 @@ export const DateInput: React.FC<DateInputProps> = ({
                 ? field.value.toISOString().split("T")[0]
                 : ""
             }
-            className={`peer w-full px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:border-emerald-600 focus:outline-none ${
-              disabled ? "opacity-50 cursor-not-allowed" : ""
+            className={`peer w-full px-4 py-3 border-2 border-gray-200 rounded-xl bg-white/50 backdrop-blur-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all duration-300 ${
+              disabled ? "opacity-50 cursor-not-allowed bg-gray-100" : ""
             } ${className}`}
           />
         )}
       </Field>
       <label
         htmlFor={id}
-        className="absolute left-3 -top-2 text-emerald-600 text-xs"
+        className="absolute left-4 -top-2.5 text-xs text-blue-600 bg-white px-2 rounded"
       >
         {label}
       </label>
