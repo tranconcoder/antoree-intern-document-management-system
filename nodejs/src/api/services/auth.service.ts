@@ -55,7 +55,7 @@ export default class AuthService {
       jti
     );
 
-    const { user_password, ...userInfo } = newUser;
+    const { user_password, ...userInfo } = newUser.toObject();
 
     return {
       user: userInfo,
@@ -92,7 +92,7 @@ export default class AuthService {
     // Store key token with public key and jti
     await KeyTokenService.createKeyToken(user._id.toString(), publicKey, jti);
 
-    const { user_password, ...userInfo } = user;
+    const { user_password, ...userInfo } = user.toObject();
 
     return { user: userInfo, tokens: { accessToken, refreshToken } };
   }

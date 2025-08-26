@@ -1,5 +1,6 @@
 import AuthController from "@/controllers/auth.controller";
 import { RequestSource } from "@/enums/requestSource.enum";
+import { catchAsyncExpress } from "@/middlewares/async.middleware.";
 import validateZodPayload from "@/middlewares/zod.middleware";
 import { loginUserSchema, registerUserSchema } from "@/validator/zod/user.zod";
 import { Router } from "express";
@@ -10,13 +11,13 @@ const authController = new AuthController();
 authRouter.post(
   "/register",
   validateZodPayload(RequestSource.Body, registerUserSchema),
-  authController.register
+  catchAsyncExpress(authController.register)
 );
 
 authRouter.post(
   "/login",
   validateZodPayload(RequestSource.Body, loginUserSchema),
-  authController.login
+  catchAsyncExpress(authController.login)
 );
 
 export default authRouter;

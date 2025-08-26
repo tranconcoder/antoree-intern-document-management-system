@@ -11,7 +11,7 @@ export class JwtService {
     jti?: string,
     options?: SignOptions
   ) {
-    const token = jwt.sign({ ...payload, jti }, privateKey, {
+    const token = jwt.sign({ ...payload }, privateKey, {
       ...JWT_CONFIG.accessToken,
       ...options,
       jwtid: jti,
@@ -26,7 +26,7 @@ export class JwtService {
     jti?: string,
     options?: SignOptions
   ) {
-    const token = jwt.sign({ ...payload, jti }, privateKey, {
+    const token = jwt.sign({ ...payload }, privateKey, {
       ...JWT_CONFIG.refreshToken,
       ...options,
       jwtid: jti,
