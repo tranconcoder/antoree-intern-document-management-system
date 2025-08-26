@@ -1,5 +1,5 @@
 export interface DocumentFile {
-  data: Buffer;
+  data: string; // Base64 string for frontend display
   contentType: string;
   fileSize: number;
   fileName: string;
@@ -9,7 +9,8 @@ export interface Document {
   _id: string;
   title: string;
   description: string;
-  previewAvatar?: Buffer;
+  previewAvatar?: string; // Base64 string for frontend
+  userId: string;
   files: DocumentFile[];
   isPremium: boolean;
   isPublic: boolean;
@@ -17,6 +18,25 @@ export interface Document {
   updatedAt: string;
 }
 
+// API Response types
+export interface GetDocumentsResponse {
+  success: boolean;
+  data: Document[];
+  message?: string;
+}
+
+export interface GetDocumentResponse {
+  success: boolean;
+  data: Document;
+  message?: string;
+}
+
+export interface DeleteDocumentResponse {
+  success: boolean;
+  message?: string;
+}
+
+// Legacy types for backward compatibility
 export interface DocumentUploadResponse {
   success: boolean;
   message: string;

@@ -35,6 +35,12 @@ export const successResponses = {
     "Document uploaded successfully",
   ] as SuccessResponseItem,
 
+  DOCUMENT_FETCH_SUCCESS: [
+    HttpStatus.OK,
+    "Document Fetch Success",
+    "Documents fetched successfully",
+  ] as SuccessResponseItem,
+
   // General success
   OK: [
     HttpStatus.OK,

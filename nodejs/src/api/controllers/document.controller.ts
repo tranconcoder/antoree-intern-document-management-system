@@ -15,4 +15,18 @@ export default new (class DocumentController {
       metadata: await documentService.uploadDocuments(body, files, req.userId),
     }).sendResponse(res);
   };
+
+  getSelfDocuments: RequestHandler = async (req, res) => {
+    new SuccessResponse({
+      successResponseItem: successResponses.DOCUMENT_FETCH_SUCCESS,
+      metadata: await documentService.getSelfDocuments(req.userId),
+    }).sendResponse(res);
+  };
+
+  getPublicDocuments: RequestHandler = async (req, res) => {
+    new SuccessResponse({
+      successResponseItem: successResponses.DOCUMENT_FETCH_SUCCESS,
+      metadata: await documentService.getPublicDocuments(),
+    }).sendResponse(res);
+  };
 })();

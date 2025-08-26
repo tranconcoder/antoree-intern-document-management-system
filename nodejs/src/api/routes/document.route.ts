@@ -16,4 +16,8 @@ documentRouter.post(
   documentController.uploadDocuments
 );
 
+documentRouter.get("/self", validateToken, documentController.getSelfDocuments);
+
+documentRouter.get("/public", documentController.getPublicDocuments);
+
 export default documentRouter;

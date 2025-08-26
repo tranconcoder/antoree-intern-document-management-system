@@ -28,4 +28,12 @@ export default new (class DocumentService {
 
     return savedDoc._id.toString();
   }
+
+  async getSelfDocuments(userId: string) {
+    return documentModel.find({ userId }, { "files.data": 0 });
+  }
+
+  async getPublicDocuments() {
+    return documentModel.find({ isPublic: true }, { "files.data": 0 });
+  }
 })();
