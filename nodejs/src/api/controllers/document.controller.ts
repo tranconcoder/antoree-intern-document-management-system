@@ -12,7 +12,7 @@ export default new (class DocumentController {
 
     new SuccessResponse({
       successResponseItem: successResponses.DOCUMENT_UPLOAD_SUCCESS,
-      metadata: await documentService.uploadDocuments(body, files),
+      metadata: await documentService.uploadDocuments(body, files, req.userId),
     }).sendResponse(res);
   };
 })();

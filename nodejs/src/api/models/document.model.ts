@@ -5,12 +5,14 @@ import {
 import { TIME_STAMPS } from "@/constants/schema.constant";
 import { getAllFileTypes } from "@/enums/fileType.enum";
 import type { TimeStamps } from "@/types/schema";
-import { model, Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 
 export interface Document extends TimeStamps {
   title: string;
   description: string;
   previewAvatar: Buffer;
+
+  userId: mongoose.Schema.Types.ObjectId;
 
   files: Array<{
     data: Buffer;
@@ -29,6 +31,8 @@ const documentSchema = new Schema<Document>(
     title: { type: String, required: true, min: 10, max: 200 },
     description: { type: String, required: true, min: 20, max: 1000 },
     previewAvatar: { type: Buffer, required: false },
+
+    userId: { type: mongoose.Types.ObjectId, required: true },
 
     // File information
     files: {

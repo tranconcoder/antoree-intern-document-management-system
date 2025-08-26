@@ -52,6 +52,13 @@ const userSlice = createSlice({
     clearError(state) {
       state.errorMessage = "";
     },
+
+    /**
+     * Update tokens only (for refresh token flow)
+     */
+    updateTokens(state, action: PayloadAction<Tokens>) {
+      state.tokens = action.payload;
+    },
   },
 
   extraReducers(builder) {
@@ -137,5 +144,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setCredentials, clearError } = userSlice.actions;
+export const { setCredentials, clearError, updateTokens } = userSlice.actions;
 export default userSlice.reducer;

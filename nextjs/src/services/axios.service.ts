@@ -1,6 +1,10 @@
+import { userModel } from "@/models/user.model";
 import axios, { AxiosError, AxiosHeaders, AxiosRequestConfig } from "axios";
 import { AXIOS_URL } from "@/configs/axios.config";
 import { RefreshTokenResponse } from "@/types/response";
+import { store } from "@/store";
+import { logoutUser } from "@/store/thunks/user.thunk";
+import { updateTokens } from "@/store/slices/user.slice";
 
 const axiosInstance = axios.create({
   baseURL: AXIOS_URL,
@@ -31,19 +35,49 @@ const toAxiosHeaders = (headers: unknown): AxiosHeaders => {
 let isRefreshing = false;
 let refreshPromise: Promise<RefreshTokenResponse> | null = null;
 
+// Helper function to perform complete logout using Redux
+const performLogout = (reason: string) => {
+  if (typeof window !== "undefined") {
+    console.log(`${reason}, logging out...`);
+
+    // Dispatch logout action to Redux store
+    store.dispatch(logoutUser());
+
+    // Small delay to ensure state is updated before redirect
+    setTimeout(() => {
+      window.location.href = "/auth/login";
+    }, 100);
+  }
+};
+
 type RetriableConfig = AxiosRequestConfig & { _retry?: boolean };
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const accessToken =
-      typeof window !== "undefined"
-        ? localStorage.getItem("accessToken")
-        : null;
+    try {
+      let accessToken = null;
+      if (typeof window !== "undefined") {
+        try {
+          const persistData = JSON.parse(
+            localStorage.getItem("persist:root") || "{}"
+          );
+          const userData = JSON.parse(persistData.user || "{}");
+          accessToken = userData.tokens?.accessToken || null;
+        } catch (parseError) {
+          console.error("Error parsing tokens from persist store:", parseError);
+          accessToken = null;
+        }
+      }
 
-    if (accessToken) {
-      const headers = toAxiosHeaders(config.headers);
-      headers.set("Authorization", `Bearer ${accessToken}`);
-      config.headers = headers;
+      console.log({ accessToken });
+
+      if (accessToken) {
+        const headers = toAxiosHeaders(config.headers);
+        headers.set("Authorization", `Bearer ${accessToken}`);
+        config.headers = headers;
+      }
+    } catch (e: any) {
+      console.error("Error in request interceptor:", e);
     }
 
     return config;
@@ -66,16 +100,26 @@ axiosInstance.interceptors.response.use(
     );
 
     if (status === 401 && !isRefreshCall) {
-      const refreshToken =
-        typeof window !== "undefined"
-          ? localStorage.getItem("refreshToken")
-          : null;
-      if (!refreshToken) {
-        // No refresh token -> clear and reject
-        if (typeof window !== "undefined") {
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
+      let refreshToken = null;
+      if (typeof window !== "undefined") {
+        try {
+          const persistData = JSON.parse(
+            localStorage.getItem("persist:root") || "{}"
+          );
+          const userData = JSON.parse(persistData.user || "{}");
+          refreshToken = userData.tokens?.refreshToken || null;
+        } catch (parseError) {
+          console.error(
+            "Error parsing refresh token from persist store:",
+            parseError
+          );
+          refreshToken = null;
         }
+      }
+
+      if (!refreshToken) {
+        // No refresh token -> perform logout
+        performLogout("No refresh token found");
         return Promise.reject(error);
       }
 
@@ -95,17 +139,19 @@ axiosInstance.interceptors.response.use(
             .then((res) => res.data)
             .then((tokens) => {
               if (typeof window !== "undefined") {
-                localStorage.setItem("accessToken", tokens.accessToken);
-                localStorage.setItem("refreshToken", tokens.refreshToken);
+                // Update tokens using Redux action
+                store.dispatch(
+                  updateTokens({
+                    accessToken: tokens.accessToken,
+                    refreshToken: tokens.refreshToken,
+                  })
+                );
               }
               return tokens;
             })
             .catch((refreshErr) => {
-              // On failure, clear auth and propagate
-              if (typeof window !== "undefined") {
-                localStorage.removeItem("accessToken");
-                localStorage.removeItem("refreshToken");
-              }
+              // On refresh failure, perform logout
+              performLogout("Refresh token failed");
               throw refreshErr;
             })
             .finally(() => {

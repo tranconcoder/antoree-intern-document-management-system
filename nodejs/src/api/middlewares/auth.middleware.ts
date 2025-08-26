@@ -13,20 +13,19 @@ export const validateToken: RequestHandler = catchAsyncExpress(
       if (!token) throw errorResponses.AUTH_TOKEN_NOT_FOUND;
 
       const accessToken = token.split(" ")[1];
+      console.log(accessToken);
       if (!accessToken) throw errorResponses.AUTH_TOKEN_NOT_FOUND;
 
       const decoded = JwtService.decode(accessToken);
+      console.log(decoded);
       if (!decoded) throw errorResponses.AUTH_TOKEN_NOT_FOUND;
 
       const { userId, jti } = decoded;
       const keyToken = await KeyTokenService.findKeyToken(userId, jti);
       if (!keyToken) throw errorResponses.AUTH_KEY_TOKEN_NOT_FOUND;
 
-      const verifySuccess = !!JwtService.verify(
-        accessToken,
-        keyToken.publicKey
-      );
-      if (!verifySuccess) throw errorResponses.AUTH_TOKEN_NOT_FOUND;
+      const verifySuccess = JwtService.verify(accessToken, keyToken.publicKey);
+      if (!verifySuccess) throw errorResponses.AUTH_INVALID_CREDENTIALS;
 
       //   Add payload to request
       req.userId = userId;

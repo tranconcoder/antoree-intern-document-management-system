@@ -4,7 +4,8 @@ import type { UploadDocumentBody } from "@/validator/zod/document.zod";
 export default new (class DocumentService {
   async uploadDocuments(
     body: UploadDocumentBody,
-    files: Express.Multer.File[]
+    files: Express.Multer.File[],
+    userId: string
   ) {
     const filesToSave = files.map((file) => ({
       data: file.buffer,
@@ -16,7 +17,11 @@ export default new (class DocumentService {
     const savedDoc = await documentModel.create({
       title: body.title,
       description: body.description,
+
+      userId: userId,
+
       files: filesToSave,
+
       isPremium: body.isPremium,
       isPublic: body.isPublic,
     });

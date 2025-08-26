@@ -687,10 +687,6 @@ export default function UploadPage() {
                         </div>
                       ))}
                     </div>
-
-                    <p className="text-sm text-gray-500">
-                      Ảnh đại diện sẽ được hiển thị khi chia sẻ tài liệu
-                    </p>
                   </div>
                 )}
 
