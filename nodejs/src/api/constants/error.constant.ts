@@ -50,4 +50,10 @@ export const errorResponses = {
     "Invalid credentials",
     "Email or password is incorrect",
   ] as ErrorResponseItem,
+
+  AUTH_TOKEN_NOT_FOUND: [
+    HttpStatus.NOT_FOUND,
+    "Token not found",
+    "Authorization token not found",
+  ] as ErrorResponseItem,
 };

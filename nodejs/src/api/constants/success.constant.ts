@@ -28,6 +28,13 @@ export const successResponses = {
     "User registered successfully",
   ] as SuccessResponseItem,
 
+  // Document success
+  DOCUMENT_UPLOAD_SUCCESS: [
+    HttpStatus.CREATED,
+    "Document Upload Success",
+    "Document uploaded successfully",
+  ] as SuccessResponseItem,
+
   // General success
   OK: [
     HttpStatus.OK,

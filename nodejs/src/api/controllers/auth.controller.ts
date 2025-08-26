@@ -1,5 +1,5 @@
 import { successResponses } from "@/constants/success.constant";
-import SuccessResponse from "@/core/sccess.core";
+import SuccessResponse from "@/core/success";
 import AuthService from "@/services/auth.service";
 import type {
   LoginUserInput,
@@ -7,7 +7,7 @@ import type {
 } from "@/validator/zod/user.zod";
 import type { Handler } from "express";
 
-export default class AuthController {
+export default new (class AuthController {
   public register: Handler = async (req, res, next) => {
     const registerPayload = req.body as RegisterUserInput;
 
@@ -27,4 +27,4 @@ export default class AuthController {
       metadata: await AuthService.login(loginPayload),
     }).sendResponse(res);
   };
-}
+})();
