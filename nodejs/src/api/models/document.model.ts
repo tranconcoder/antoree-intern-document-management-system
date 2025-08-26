@@ -12,10 +12,12 @@ export interface Document extends TimeStamps {
   description: string;
   previewAvatar: Buffer;
 
-  fileContentType: string;
-  fileBytes: Buffer;
-  fileSize: number;
-  fileName: string;
+  files: Array<{
+    data: Buffer;
+    contentType: string;
+    fileSize: number;
+    fileName: string;
+  }>;
 
   isPremium: boolean;
   isPublic: boolean;
@@ -29,19 +31,32 @@ const documentSchema = new Schema<Document>(
     previewAvatar: { type: Buffer, required: false },
 
     // File information
-    fileContentType: {
-      type: String,
-      required: true,
-      enum: getAllFileTypes(),
+    files: {
+      type: [
+        {
+          data: {
+            type: Buffer,
+            min: 3 * 1024,
+            max: 5 * 1024 * 1024,
+          },
+          contentType: {
+            type: String,
+            required: true,
+            enum: getAllFileTypes(),
+          },
+          fileSize: {
+            type: Number,
+            required: true,
+          },
+          fileName: {
+            type: String,
+            required: true,
+            min: 3,
+            max: 100,
+          },
+        },
+      ],
     },
-    fileBytes: {
-      type: Buffer,
-      required: true,
-      min: 1024 * 5, // 5 KB
-      max: 1024 * 1024 * 10, // 5 MB
-    },
-    fileSize: { type: Number, required: true },
-    fileName: { type: String, required: true, min: 3, max: 100 },
 
     isPremium: { type: Boolean, default: false },
     isPublic: { type: Boolean, default: false },
