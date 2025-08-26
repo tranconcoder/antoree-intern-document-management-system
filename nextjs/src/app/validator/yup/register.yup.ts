@@ -25,6 +25,10 @@ export const registerSchema = Yup.object({
   user_gender: Yup.boolean().required("Giới tính là bắt buộc"),
 
   user_dayOfBirth: Yup.date()
+    .max(
+      new Date(Date.now() - 13 * 365 * 24 * 60 * 60 * 1000),
+      "Bạn phải từ 13 tuổi trở lên"
+    )
     .max(new Date(), "Ngày sinh không thể là ngày trong tương lai")
     .required("Ngày sinh là bắt buộc"),
 });
@@ -37,4 +41,13 @@ export type RegisterFormValues = {
   user_lastName: string;
   user_gender: boolean;
   user_dayOfBirth: Date;
+};
+
+export type RegisterApiPayload = {
+  user_email: string;
+  user_password: string;
+  user_firstName: string;
+  user_lastName: string;
+  user_gender: boolean;
+  user_dayOfBirth: number;
 };

@@ -9,6 +9,7 @@ import { fetchLogin } from "@/store/thunks/user.thunk";
 import { clearError } from "@/store/slices/user.slice";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
+import Link from "next/link";
 
 type FormValues = {
   user_email: string;
@@ -41,10 +42,7 @@ export default function LoginPage() {
     }
   }, []);
 
-  const onSubmit = async (
-    values: FormValues,
-    { setSubmitting, setFieldError, setStatus }: any
-  ) => {
+  const onSubmit = async (values: FormValues) => {
     // Dispatch login thunk
     await dispatch(fetchLogin(values));
   };
@@ -109,6 +107,19 @@ export default function LoginPage() {
               >
                 {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
               </Button>
+            </div>
+
+            {/* Register Link */}
+            <div className="text-center pt-4">
+              <p className="text-sm text-gray-600">
+                Chưa có tài khoản?{" "}
+                <Link
+                  href="/auth/register"
+                  className="text-emerald-600 hover:text-emerald-700 font-medium"
+                >
+                  Đăng ký ngay
+                </Link>
+              </p>
             </div>
           </Form>
         )}

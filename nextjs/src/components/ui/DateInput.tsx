@@ -8,6 +8,7 @@ interface DateInputProps {
   name: string;
   label: string;
   className?: string;
+  disabled?: boolean;
 }
 
 export const DateInput: React.FC<DateInputProps> = ({
@@ -15,6 +16,7 @@ export const DateInput: React.FC<DateInputProps> = ({
   name,
   label,
   className = "",
+  disabled = false,
 }) => {
   return (
     <div className="relative">
@@ -24,6 +26,7 @@ export const DateInput: React.FC<DateInputProps> = ({
             {...field}
             id={id}
             type="date"
+            disabled={disabled}
             onChange={(e) => {
               const date = new Date(e.target.value);
               form.setFieldValue(name, date);
@@ -33,7 +36,9 @@ export const DateInput: React.FC<DateInputProps> = ({
                 ? field.value.toISOString().split("T")[0]
                 : ""
             }
-            className={`peer w-full px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:border-emerald-600 focus:outline-none ${className}`}
+            className={`peer w-full px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:border-emerald-600 focus:outline-none ${
+              disabled ? "opacity-50 cursor-not-allowed" : ""
+            } ${className}`}
           />
         )}
       </Field>

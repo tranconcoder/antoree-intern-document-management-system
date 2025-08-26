@@ -9,6 +9,7 @@ interface SelectProps {
   label: string;
   options: { value: string | boolean; label: string }[];
   className?: string;
+  disabled?: boolean;
 }
 
 export const Select: React.FC<SelectProps> = ({
@@ -17,6 +18,7 @@ export const Select: React.FC<SelectProps> = ({
   label,
   options,
   className = "",
+  disabled = false,
 }) => {
   return (
     <div className="relative">
@@ -25,6 +27,7 @@ export const Select: React.FC<SelectProps> = ({
           <select
             {...field}
             id={id}
+            disabled={disabled}
             onChange={(e) => {
               const value = e.target.value;
               // Convert string to boolean if needed
@@ -33,7 +36,9 @@ export const Select: React.FC<SelectProps> = ({
               form.setFieldValue(name, parsedValue);
             }}
             value={String(field.value)}
-            className={`peer w-full px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:border-emerald-600 focus:outline-none ${className}`}
+            className={`peer w-full px-3 py-2 border-b-2 border-gray-300 bg-transparent focus:border-emerald-600 focus:outline-none ${
+              disabled ? "opacity-50 cursor-not-allowed" : ""
+            } ${className}`}
           >
             <option value="" disabled>
               Chọn {label.toLowerCase()}

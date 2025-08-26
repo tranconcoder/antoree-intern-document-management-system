@@ -1,6 +1,7 @@
 import { User } from "@/types/user";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { fetchLogin, fetchRegister } from "../thunks/user.thunk";
+import { REHYDRATE } from "redux-persist";
+import { fetchLogin, fetchRegister, logoutUser } from "../thunks/user.thunk";
 
 // Define a type for the slice state
 interface Tokens {
@@ -46,16 +47,6 @@ const userSlice = createSlice({
     },
 
     /**
-     * Clear user credentials on logout
-     */
-    logout(state) {
-      state.user = null;
-      state.tokens = null;
-      state.isLoggedIn = false;
-      state.errorMessage = "";
-    },
-
-    /**
      * Clear error message
      */
     clearError(state) {
@@ -65,6 +56,19 @@ const userSlice = createSlice({
 
   extraReducers(builder) {
     builder
+      // Handle rehydration from redux-persist
+      .addCase(REHYDRATE, (state, action: any) => {
+        if (action.payload?.user) {
+          // Check if tokens are still valid (you might want to add expiration check here)
+          const persistedUser = action.payload.user;
+          if (persistedUser.tokens && persistedUser.user) {
+            state.user = persistedUser.user;
+            state.tokens = persistedUser.tokens;
+            state.isLoggedIn = true;
+            state.errorMessage = "";
+          }
+        }
+      })
       // Login cases
       .addCase(fetchLogin.pending, (state) => {
         state.isLoading = true;
@@ -111,9 +115,17 @@ const userSlice = createSlice({
         state.isLoading = false;
 
         state.errorMessage = action.error.message || "Đăng ký thất bại";
+      })
+
+      // Logout cases
+      .addCase(logoutUser.fulfilled, (state) => {
+        state.user = null;
+        state.tokens = null;
+        state.isLoggedIn = false;
+        state.errorMessage = "";
       });
   },
 });
 
-export const { setCredentials, logout, clearError } = userSlice.actions;
+export const { setCredentials, clearError } = userSlice.actions;
 export default userSlice.reducer;

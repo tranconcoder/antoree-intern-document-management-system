@@ -5,6 +5,7 @@ import { Formik, Form } from "formik";
 import {
   registerSchema,
   type RegisterFormValues,
+  type RegisterApiPayload,
 } from "@/app/validator/yup/register.yup";
 import { useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
@@ -14,6 +15,7 @@ import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { DateInput } from "@/components/ui/DateInput";
 import { Button } from "@/components/ui/Button";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -29,7 +31,7 @@ export default function RegisterPage() {
     user_firstName: "",
     user_lastName: "",
     user_gender: false,
-    user_dayOfBirth: new Date(),
+    user_dayOfBirth: new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000), // Default to 18 years ago
   };
 
   const genderOptions = [
@@ -51,45 +53,19 @@ export default function RegisterPage() {
     }
   }, []);
 
-  const onSubmit = async (
-    values: RegisterFormValues,
-    { setSubmitting, setFieldError, setStatus }: any
-  ) => {
-    try {
-      // Clear any previous errors
-      setStatus(null);
-      dispatch(clearError());
+  const onSubmit = async (values: RegisterFormValues) => {
+    // Convert date to Unix timestamp and prepare payload
+    const payloadForApi: RegisterApiPayload = {
+      user_email: values.user_email,
+      user_password: values.user_password,
+      user_firstName: values.user_firstName,
+      user_lastName: values.user_lastName,
+      user_gender: values.user_gender,
+      user_dayOfBirth: Math.floor(values.user_dayOfBirth.getTime() / 1000),
+    };
 
-      // Convert date to Unix timestamp and prepare payload
-      const payloadForApi = {
-        user_email: values.user_email,
-        user_password: values.user_password,
-        user_firstName: values.user_firstName,
-        user_lastName: values.user_lastName,
-        user_gender: values.user_gender,
-        user_dayOfBirth: Math.floor(values.user_dayOfBirth.getTime() / 1000),
-      };
-
-      // Dispatch register thunk
-      const result = await dispatch(fetchRegister(payloadForApi as any));
-
-      if (fetchRegister.fulfilled.match(result)) {
-        // Registration successful - redirect will happen via useEffect
-        console.log("Registration successful");
-      } else if (fetchRegister.rejected.match(result)) {
-        // Registration failed - error is already in store, but also set form error
-        const errorMsg = result.error.message || "Đăng ký thất bại";
-        setFieldError("user_email", errorMsg);
-        setStatus({ error: errorMsg });
-      }
-    } catch (error: any) {
-      console.error("Register error:", error);
-      const errorMsg = "Đã xảy ra lỗi không mong muốn";
-      setFieldError("user_email", errorMsg);
-      setStatus({ error: errorMsg });
-    } finally {
-      setSubmitting(false);
-    }
+    // Dispatch register thunk
+    await dispatch(fetchRegister(payloadForApi));
   };
 
   return (
@@ -112,7 +88,7 @@ export default function RegisterPage() {
       {/* Show loading state */}
       {isLoading && (
         <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-md">
-          <p className="text-sm text-blue-600">Đang xử lý đăng ký...</p>
+          <span>Đang xử lý đăng ký...</span>
         </div>
       )}
 
@@ -123,13 +99,6 @@ export default function RegisterPage() {
       >
         {({ isSubmitting, status }) => (
           <Form className="space-y-4">
-            {/* Show form-level error */}
-            {status?.error && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-md">
-                <p className="text-sm text-red-600">{status.error}</p>
-              </div>
-            )}
-
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -181,12 +150,14 @@ export default function RegisterPage() {
                 name="user_gender"
                 label="Giới tính"
                 options={genderOptions}
+                disabled={isLoading}
               />
 
               <DateInput
                 id="user_dayOfBirth"
                 name="user_dayOfBirth"
                 label="Ngày sinh"
+                disabled={isLoading}
               />
             </div>
 
@@ -201,6 +172,19 @@ export default function RegisterPage() {
               >
                 {isLoading ? "Đang đăng ký..." : "Đăng ký"}
               </Button>
+            </div>
+
+            {/* Login Link */}
+            <div className="text-center pt-4">
+              <p className="text-sm text-gray-600">
+                Đã có tài khoản?{" "}
+                <Link
+                  href="/auth/login"
+                  className="text-emerald-600 hover:text-emerald-700 font-medium"
+                >
+                  Đăng nhập ngay
+                </Link>
+              </p>
             </div>
           </Form>
         )}
