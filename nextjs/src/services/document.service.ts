@@ -1,11 +1,6 @@
+import { HttpStatusCode } from "axios";
 import axiosInstance from "./axios.service";
-import type {
-  Document,
-  DocumentFile,
-  GetDocumentsResponse,
-  GetDocumentResponse,
-  DeleteDocumentResponse,
-} from "@/types/document";
+import type { Document, GetDocumentsResponse } from "@/types/document";
 
 class DocumentService {
   /**
@@ -17,13 +12,11 @@ class DocumentService {
         "/documents/self"
       );
 
-      if (response.data.success) {
-        return response.data.data;
+      if (response.status === HttpStatusCode.Ok) {
+        return response.data.metadata;
       }
 
-      throw new Error(
-        response.data.message || "Failed to fetch self documents"
-      );
+      throw new Error("Failed to fetch self documents");
     } catch (error) {
       console.error("Error fetching self documents:", error);
       throw error;
@@ -39,13 +32,11 @@ class DocumentService {
         "/documents/public"
       );
 
-      if (response.data.success) {
-        return response.data.data;
+      if (response.status === HttpStatusCode.Ok) {
+        return response.data.metadata;
       }
 
-      throw new Error(
-        response.data.message || "Failed to fetch public documents"
-      );
+      throw new Error("Failed to fetch public documents");
     } catch (error) {
       console.error("Error fetching public documents:", error);
       throw error;

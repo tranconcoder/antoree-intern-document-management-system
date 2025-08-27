@@ -215,7 +215,7 @@ export default function DocumentCard({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2 text-xs text-gray-500">
             <IoTime className="w-4 h-4" />
-            <span>{formatDate(document.createdAt)}</span>
+            <span>{formatDate(document.created_at)}</span>
           </div>
         </div>
 

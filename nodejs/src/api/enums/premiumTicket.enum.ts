@@ -1,5 +1,4 @@
 export enum PremiumTicketTime {
-  Week = "week",
   Month = "month",
   Year = "year",
   Lifetime = "lifetime",

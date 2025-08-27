@@ -6,3 +6,6 @@ export const PREMIUM_TICKET_DOCUMENT_NAME = "PremiumTicket";
 
 export const DOCUMENT_COLLECTION_NAME = "documents";
 export const DOCUMENT_DOCUMENT_NAME = "Document";
+
+export const LEAD_COLLECTION_NAME = "leads";
+export const LEAD_DOCUMENT_NAME = "Lead";

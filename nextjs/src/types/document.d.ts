@@ -1,5 +1,5 @@
 export interface DocumentFile {
-  data: string; // Base64 string for frontend display
+  data?: string;
   contentType: string;
   fileSize: number;
   fileName: string;
@@ -14,15 +14,13 @@ export interface Document {
   files: DocumentFile[];
   isPremium: boolean;
   isPublic: boolean;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 // API Response types
 export interface GetDocumentsResponse {
-  success: boolean;
-  data: Document[];
-  message?: string;
+  metadata: Document[];
 }
 
 export interface GetDocumentResponse {

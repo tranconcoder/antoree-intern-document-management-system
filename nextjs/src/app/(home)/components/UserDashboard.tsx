@@ -2,14 +2,22 @@
 
 import Link from "next/link";
 import { IoDocumentText, IoCloudUpload, IoAnalytics } from "react-icons/io5";
+import PremiumSection from "./PremiumSection";
 
 interface UserDashboardProps {
   user: {
     user_firstName?: string;
+    isPremium?: boolean;
   } | null;
 }
 
 export default function UserDashboard({ user }: UserDashboardProps) {
+  const handlePremiumUpgrade = (planId: string) => {
+    // Handle premium upgrade logic
+    console.log("Premium upgrade clicked for plan:", planId);
+    // You can add redirect to payment page or open modal
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -49,6 +57,11 @@ export default function UserDashboard({ user }: UserDashboardProps) {
               <p className="text-gray-600">Xem báo cáo và phân tích</p>
             </Link>
           </div>
+        </div>
+
+        {/* Premium Section - Moved below the quick actions */}
+        <div className="mt-16">
+          <PremiumSection user={user} onUpgrade={handlePremiumUpgrade} />
         </div>
       </div>
     </div>

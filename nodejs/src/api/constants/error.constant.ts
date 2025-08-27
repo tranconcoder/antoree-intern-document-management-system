@@ -56,4 +56,19 @@ export const errorResponses = {
     "Token not found",
     "Authorization token not found",
   ] as ErrorResponseItem,
+
+  //
+  //   Lead error
+  //
+  LEAD_ALREADY_EXISTS: [
+    HttpStatus.CONFLICT,
+    "Lead already exists",
+    "Lead with this email already exists",
+  ] as ErrorResponseItem,
+
+  LEAD_NOT_FOUND: [
+    HttpStatus.NOT_FOUND,
+    "Lead not found",
+    "Lead with this ID does not exist",
+  ] as ErrorResponseItem,
 };
