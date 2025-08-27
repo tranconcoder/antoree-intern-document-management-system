@@ -17,29 +17,29 @@ export default function StatsCard({
   subtitle,
   icon: IconComponent,
   color,
-  loading = false
+  loading = false,
 }: StatsCardProps) {
   const colorClasses = {
     blue: {
       bg: "bg-blue-50",
-      icon: "text-blue-600"
+      icon: "text-blue-600",
     },
     green: {
       bg: "bg-green-50",
-      icon: "text-green-600"
+      icon: "text-green-600",
     },
     yellow: {
       bg: "bg-yellow-50",
-      icon: "text-yellow-600"
+      icon: "text-yellow-600",
     },
     purple: {
       bg: "bg-purple-50",
-      icon: "text-purple-600"
+      icon: "text-purple-600",
     },
     red: {
       bg: "bg-red-50",
-      icon: "text-red-600"
-    }
+      icon: "text-red-600",
+    },
   };
 
   if (loading) {
@@ -61,18 +61,20 @@ export default function StatsCard({
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-medium text-gray-600">{title}</h3>
-        <div className={`w-12 h-12 ${colorClasses[color].bg} rounded-lg flex items-center justify-center`}>
+        <div
+          className={`w-12 h-12 ${colorClasses[color].bg} rounded-lg flex items-center justify-center`}
+        >
           <IconComponent className={`w-6 h-6 ${colorClasses[color].icon}`} />
         </div>
       </div>
-      
+
       <div className="mb-2">
-        <p className="text-2xl font-bold text-gray-900">{value.toLocaleString()}</p>
+        <p className="text-2xl font-bold text-gray-900">
+          {value.toLocaleString()}
+        </p>
       </div>
-      
-      {subtitle && (
-        <p className="text-sm text-gray-600">{subtitle}</p>
-      )}
+
+      {subtitle && <p className="text-sm text-gray-600">{subtitle}</p>}
     </div>
   );
 }

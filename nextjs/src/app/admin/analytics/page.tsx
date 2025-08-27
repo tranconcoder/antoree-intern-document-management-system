@@ -25,7 +25,7 @@ export default function AnalyticsPage() {
           icon={IoEye}
           color="blue"
         />
-        
+
         <StatsCard
           title="Unique Visitors"
           value="12,450"
@@ -35,7 +35,7 @@ export default function AnalyticsPage() {
           icon={IoPeople}
           color="green"
         />
-        
+
         <StatsCard
           title="Avg. Session Time"
           value="3m 24s"
@@ -45,7 +45,7 @@ export default function AnalyticsPage() {
           icon={IoTime}
           color="purple"
         />
-        
+
         <StatsCard
           title="Bounce Rate"
           value="42.3%"
@@ -81,7 +81,7 @@ export default function AnalyticsPage() {
           </div>
         </ChartCard>
       </div>
-      
+
       <ChartCard title="Real-time Analytics">
         <div className="h-96 flex items-center justify-center text-gray-500">
           <div className="text-center">

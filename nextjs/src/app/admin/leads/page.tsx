@@ -1,10 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { 
-  IoMail, 
-  IoSearch
-} from "react-icons/io5";
+import { IoMail, IoSearch } from "react-icons/io5";
 import axios from "@/services/axios.service";
 
 interface Lead {
@@ -39,7 +36,7 @@ export default function LeadsPage() {
     page: 1,
     limit: 10,
     total: 0,
-    totalPages: 0
+    totalPages: 0,
   });
 
   const loadLeads = async () => {
@@ -48,20 +45,22 @@ export default function LeadsPage() {
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: "10",
-        ...(searchTerm && { search: searchTerm })
+        ...(searchTerm && { search: searchTerm }),
       });
 
       const response = await axios.get(`/leads?${params}`);
-      
+
       if (response.data) {
         const data: LeadsResponse = response.data;
         setLeads(data.leads || []);
-        setPagination(data.pagination || {
-          page: 1,
-          limit: 10,
-          total: 0,
-          totalPages: 0
-        });
+        setPagination(
+          data.pagination || {
+            page: 1,
+            limit: 10,
+            total: 0,
+            totalPages: 0,
+          }
+        );
       }
     } catch (error) {
       console.error("Error loading leads:", error);
@@ -83,8 +82,8 @@ export default function LeadsPage() {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("vi-VN", {
       day: "2-digit",
-      month: "2-digit", 
-      year: "numeric"
+      month: "2-digit",
+      year: "numeric",
     });
   };
 
@@ -115,7 +114,9 @@ export default function LeadsPage() {
       {/* Stats Summary */}
       <div className="bg-white rounded-lg border border-gray-200 p-6">
         <div className="text-center">
-          <div className="text-3xl font-bold text-gray-900 mb-2">{pagination.total}</div>
+          <div className="text-3xl font-bold text-gray-900 mb-2">
+            {pagination.total}
+          </div>
           <div className="text-gray-600">Total Leads</div>
         </div>
       </div>
@@ -164,7 +165,10 @@ export default function LeadsPage() {
                 ))
               ) : leads.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center text-gray-500">
+                  <td
+                    colSpan={4}
+                    className="px-6 py-8 text-center text-gray-500"
+                  >
                     <div className="flex flex-col items-center">
                       <IoMail className="w-12 h-12 text-gray-300 mb-3" />
                       <p>No leads found</p>
@@ -176,8 +180,12 @@ export default function LeadsPage() {
                   <tr key={lead.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div>
-                        <div className="font-medium text-gray-900">{lead.lead_name}</div>
-                        <div className="text-sm text-gray-600">{lead.lead_email}</div>
+                        <div className="font-medium text-gray-900">
+                          {lead.lead_name}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {lead.lead_email}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
@@ -200,11 +208,11 @@ export default function LeadsPage() {
         {pagination.totalPages > 1 && (
           <div className="px-6 py-3 border-t border-gray-200 flex items-center justify-between">
             <div className="text-sm text-gray-700">
-              Showing {((pagination.page - 1) * pagination.limit) + 1} to{" "}
-              {Math.min(pagination.page * pagination.limit, pagination.total)} of{" "}
-              {pagination.total} results
+              Showing {(pagination.page - 1) * pagination.limit + 1} to{" "}
+              {Math.min(pagination.page * pagination.limit, pagination.total)}{" "}
+              of {pagination.total} results
             </div>
-            
+
             <div className="flex items-center space-x-2">
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
@@ -213,13 +221,17 @@ export default function LeadsPage() {
               >
                 Previous
               </button>
-              
+
               <span className="px-3 py-2 text-sm text-gray-700">
                 Page {pagination.page} of {pagination.totalPages}
               </span>
-              
+
               <button
-                onClick={() => setCurrentPage(Math.min(pagination.totalPages, currentPage + 1))}
+                onClick={() =>
+                  setCurrentPage(
+                    Math.min(pagination.totalPages, currentPage + 1)
+                  )
+                }
                 disabled={currentPage === pagination.totalPages}
                 className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >

@@ -25,7 +25,7 @@ export default function OrdersPage() {
           icon={IoCard}
           color="blue"
         />
-        
+
         <StatsCard
           title="This Month"
           value="145"
@@ -35,7 +35,7 @@ export default function OrdersPage() {
           icon={IoCalendar}
           color="green"
         />
-        
+
         <StatsCard
           title="Total Revenue"
           value="24,500,000đ"
@@ -45,7 +45,7 @@ export default function OrdersPage() {
           icon={IoCash}
           color="yellow"
         />
-        
+
         <StatsCard
           title="Avg. Order Value"
           value="1,967,000đ"

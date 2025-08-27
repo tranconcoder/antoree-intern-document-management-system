@@ -3,14 +3,14 @@
 import React, { useState, useEffect } from "react";
 import StatsCard from "../components/StatsCard";
 import ChartCard from "../components/ChartCard";
-import { 
-  IoEye, 
-  IoPeople, 
-  IoCard, 
+import {
+  IoEye,
+  IoPeople,
+  IoCard,
   IoCash,
   IoTrendingUp,
   IoCalendar,
-  IoRefresh
+  IoRefresh,
 } from "react-icons/io5";
 import axios from "@/services/axios.service";
 
@@ -47,23 +47,23 @@ export default function AdminDashboard() {
     traffic: {
       total: 12450,
       change: "+12.5%",
-      trend: "up"
+      trend: "up",
     },
     leads: {
       total: 0, // Sẽ load từ API thực tế
-      change: "+8.2%", 
-      trend: "up"
+      change: "+8.2%",
+      trend: "up",
     },
     orders: {
       total: 145,
       revenue: 2450000,
       change: "+15.3%",
-      trend: "up"
+      trend: "up",
     },
     conversionRate: {
       leadsToTraffic: 0, // Sẽ tính toán từ leads/traffic
-      revenueToTraffic: 0 // Sẽ tính toán từ revenue/traffic
-    }
+      revenueToTraffic: 0, // Sẽ tính toán từ revenue/traffic
+    },
   };
 
   const fetchLeadStats = async () => {
@@ -84,26 +84,28 @@ export default function AdminDashboard() {
     try {
       // Fetch leads data từ API thực tế
       const leadsTotal = await fetchLeadStats();
-      
+
       // Tính toán conversion rates
-      const leadsToTraffic = mockStats.traffic.total > 0 
-        ? ((leadsTotal / mockStats.traffic.total) * 100).toFixed(2)
-        : "0.00";
-      
-      const revenueToTraffic = mockStats.traffic.total > 0
-        ? ((mockStats.orders.revenue / mockStats.traffic.total)).toFixed(0)
-        : "0";
+      const leadsToTraffic =
+        mockStats.traffic.total > 0
+          ? ((leadsTotal / mockStats.traffic.total) * 100).toFixed(2)
+          : "0.00";
+
+      const revenueToTraffic =
+        mockStats.traffic.total > 0
+          ? (mockStats.orders.revenue / mockStats.traffic.total).toFixed(0)
+          : "0";
 
       const updatedStats: DashboardStats = {
         ...mockStats,
         leads: {
           ...mockStats.leads,
-          total: leadsTotal
+          total: leadsTotal,
         },
         conversionRate: {
           leadsToTraffic: parseFloat(leadsToTraffic),
-          revenueToTraffic: parseFloat(revenueToTraffic)
-        }
+          revenueToTraffic: parseFloat(revenueToTraffic),
+        },
       };
 
       setStats(updatedStats);
@@ -131,7 +133,7 @@ export default function AdminDashboard() {
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600">Key metrics overview</p>
         </div>
-        
+
         <button
           onClick={handleRefresh}
           className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -151,7 +153,7 @@ export default function AdminDashboard() {
           color="blue"
           loading={loading}
         />
-        
+
         <StatsCard
           title="Total Leads"
           value={stats?.leads.total || 0}
@@ -160,7 +162,7 @@ export default function AdminDashboard() {
           color="green"
           loading={loading}
         />
-        
+
         <StatsCard
           title="Orders"
           value={stats?.orders.total || 0}
@@ -169,7 +171,7 @@ export default function AdminDashboard() {
           color="purple"
           loading={loading}
         />
-        
+
         <StatsCard
           title="Revenue"
           value={`${(stats?.orders.revenue || 0).toLocaleString()}đ`}
@@ -183,15 +185,19 @@ export default function AdminDashboard() {
       {/* Conversion Rates - Simplified */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Conversion Rate</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Conversion Rate
+          </h3>
           <div className="text-3xl font-bold text-green-600 mb-2">
             {stats?.conversionRate.leadsToTraffic || 0}%
           </div>
           <p className="text-gray-600">Leads from Traffic</p>
         </div>
-        
+
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Revenue per Visitor</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Revenue per Visitor
+          </h3>
           <div className="text-3xl font-bold text-blue-600 mb-2">
             {stats?.conversionRate.revenueToTraffic || 0}đ
           </div>
