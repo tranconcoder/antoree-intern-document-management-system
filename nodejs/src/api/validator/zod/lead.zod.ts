@@ -6,9 +6,8 @@ export const createLeadSchema = z.object({
   lead_phone: z.string().optional(),
   lead_company: z.string().optional(),
   lead_message: z.string().optional(),
-  lead_source: z.string().min(1, "Lead source is required"),
   lead_tags: z.array(z.string()).optional(),
-  lead_metadata: z.record(z.unknown()).optional(),
+  lead_metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type CreateLeadInput = z.infer<typeof createLeadSchema>;
@@ -19,12 +18,11 @@ export const updateLeadSchema = z.object({
   lead_phone: z.string().optional(),
   lead_company: z.string().optional(),
   lead_message: z.string().optional(),
-  lead_source: z.string().min(1, "Lead source is required").optional(),
   lead_status: z
     .enum(["new", "contacted", "qualified", "converted", "lost"])
     .optional(),
   lead_tags: z.array(z.string()).optional(),
-  lead_metadata: z.record(z.unknown()).optional(),
+  lead_metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type UpdateLeadInput = z.infer<typeof updateLeadSchema>;
@@ -43,7 +41,6 @@ export const getLeadsSchema = z.object({
   status: z
     .enum(["new", "contacted", "qualified", "converted", "lost"])
     .optional(),
-  source: z.string().optional(),
   search: z.string().optional(),
 });
 

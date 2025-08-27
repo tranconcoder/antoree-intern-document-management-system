@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { IoDocumentText, IoCloudUpload, IoAnalytics } from "react-icons/io5";
 import PremiumSection from "./PremiumSection";
+import LeadComponent from "./LeadComponent";
 
 interface UserDashboardProps {
   user: {
@@ -62,6 +63,11 @@ export default function UserDashboard({ user }: UserDashboardProps) {
         {/* Premium Section - Moved below the quick actions */}
         <div className="mt-16">
           <PremiumSection user={user} onUpgrade={handlePremiumUpgrade} />
+        </div>
+
+        {/* Lead Component for logged-in users */}
+        <div className="mt-16">
+          <LeadComponent />
         </div>
       </div>
     </div>

@@ -18,7 +18,6 @@ export interface LeadResponse {
     lead_phone?: string;
     lead_company?: string;
     lead_message?: string;
-    lead_source: string;
     lead_status: string;
     lead_tags?: string[];
     createdAt: Date;
@@ -39,7 +38,6 @@ export interface LeadsResponse {
 export interface LeadStatsResponse {
   total: number;
   byStatus: Record<string, number>;
-  bySource: Record<string, number>;
   byDate: {
     daily: Record<string, number>;
     monthly: Record<string, number>;

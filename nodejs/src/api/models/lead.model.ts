@@ -14,7 +14,6 @@ export interface Lead extends TimeStamps {
   lead_phone?: string;
   lead_company?: string;
   lead_message?: string;
-  lead_source: string;
   lead_status: "new" | "contacted" | "qualified" | "converted" | "lost";
   lead_tags?: string[];
   lead_metadata?: Record<string, any>;
@@ -27,7 +26,6 @@ export const leadSchema = new Schema<Lead>(
     lead_phone: { type: String },
     lead_company: { type: String },
     lead_message: { type: String },
-    lead_source: { type: String, required: true },
     lead_status: {
       type: String,
       enum: ["new", "contacted", "qualified", "converted", "lost"],
@@ -45,7 +43,6 @@ export const leadSchema = new Schema<Lead>(
 // Index for better query performance
 leadSchema.index({ lead_email: 1 });
 leadSchema.index({ lead_status: 1 });
-leadSchema.index({ lead_source: 1 });
 leadSchema.index({ createdAt: -1 });
 
 export default mongoose.model<Lead>(LEAD_DOCUMENT_NAME, leadSchema);

@@ -1,54 +1,28 @@
 import { errorResponses } from "@/constants/error.constant";
 import ErrorResponse from "@/core/error.core";
 import leadModel from "@/models/lead.model";
-import type {
-  CreateLeadInput,
-  UpdateLeadInput,
-  GetLeadsInput,
-  GetLeadStatsI    // Monthl    // Monthly stats
-    const monthlyStats = await leadModel.aggregate([
-      {
-        $match: {
-          created_at: { $gte: startDate, $lte: endDate },
-        },
-      },
-      {
-        $group: {
-          _id: {
-            $dateToString: { format: "%Y-%m", date: "$created_at" },
-          },
-          count: { $sum: 1 },
-        },
-      },
-      {
-        $sort: { "_id": 1 },
-      },
-    ]);onthlyStats = await leadModel.aggregate([
-      {
-        $match: {
-          created_at: { $gte: startDate, $lte: endDate },
-        },
-      },
-      {
-        $group: {
-          _id: {
-            $dateToString: { format: "%Y-%m", date: "$created_at" },
-          },
-          count: { $sum: 1 },
-        },
-      },/validator/zod/lead.zod";
-import type { LeadStatsResponse, LeadsResponse } from "@/types/response";
+import type { CreateLeadInput } from "@/validator/zod/lead.zod";
 
 export default class LeadService {
   public static async createLead(payload: CreateLeadInput): Promise<any> {
-    // Check if lead with same email already exists
-    const existingLead = await leadModel.findOne({
+    // Check if email has reached daily limit (3 times per day)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const todayLeadCount = await leadModel.countDocuments({
       lead_email: payload.lead_email,
+      created_at: {
+        $gte: todayStart,
+        $lte: todayEnd,
+      },
     });
 
-    if (existingLead) {
+    if (todayLeadCount >= 3) {
       throw new ErrorResponse({
-        errorResponseItem: errorResponses.LEAD_ALREADY_EXISTS,
+        errorResponseItem: errorResponses.EMAIL_DAILY_LIMIT_EXCEEDED,
       });
     }
 
@@ -62,7 +36,6 @@ export default class LeadService {
       lead_phone: newLead.lead_phone,
       lead_company: newLead.lead_company,
       lead_message: newLead.lead_message,
-      lead_source: newLead.lead_source,
       lead_status: newLead.lead_status,
       lead_tags: newLead.lead_tags,
       createdAt: newLead.created_at,
@@ -70,7 +43,7 @@ export default class LeadService {
     };
   }
 
-  public static async getLeads(query: GetLeadsInput): Promise<LeadsResponse> {
+  public static async getLeads(query: any): Promise<any> {
     const page = query.page || 1;
     const limit = query.limit || 10;
     const skip = (page - 1) * limit;
@@ -80,10 +53,6 @@ export default class LeadService {
 
     if (query.status) {
       filter.lead_status = query.status;
-    }
-
-    if (query.source) {
-      filter.lead_source = query.source;
     }
 
     if (query.search) {
@@ -113,7 +82,6 @@ export default class LeadService {
       lead_phone: lead.lead_phone,
       lead_company: lead.lead_company,
       lead_message: lead.lead_message,
-      lead_source: lead.lead_source,
       lead_status: lead.lead_status,
       lead_tags: lead.lead_tags,
       createdAt: lead.created_at,
@@ -147,7 +115,6 @@ export default class LeadService {
       lead_phone: lead.lead_phone,
       lead_company: lead.lead_company,
       lead_message: lead.lead_message,
-      lead_source: lead.lead_source,
       lead_status: lead.lead_status,
       lead_tags: lead.lead_tags,
       createdAt: lead.created_at,
@@ -155,44 +122,10 @@ export default class LeadService {
     };
   }
 
-  public static async updateLead(leadId: string, payload: UpdateLeadInput): Promise<any> {
-    const updatedLead = await leadModel
-      .findByIdAndUpdate(leadId, payload, { new: true })
-      .lean();
-
-    if (!updatedLead) {
-      throw new ErrorResponse({
-        errorResponseItem: errorResponses.LEAD_NOT_FOUND,
-      });
-    }
-
-    return {
-      id: updatedLead._id.toString(),
-      lead_name: updatedLead.lead_name,
-      lead_email: updatedLead.lead_email,
-      lead_phone: updatedLead.lead_phone,
-      lead_company: updatedLead.lead_company,
-      lead_message: updatedLead.lead_message,
-      lead_source: updatedLead.lead_source,
-      lead_status: updatedLead.lead_status,
-      lead_tags: updatedLead.lead_tags,
-      createdAt: updatedLead.created_at,
-      updatedAt: updatedLead.updated_at,
-    };
-  }
-
-  public static async deleteLead(leadId: string): Promise<void> {
-    const deletedLead = await leadModel.findByIdAndDelete(leadId);
-
-    if (!deletedLead) {
-      throw new ErrorResponse({
-        errorResponseItem: errorResponses.LEAD_NOT_FOUND,
-      });
-    }
-  }
-
-  public static async getLeadStats(query: GetLeadStatsInput): Promise<LeadStatsResponse> {
-    const startDate = query.startDate ? new Date(query.startDate) : new Date(2020, 0, 1);
+  public static async getLeadStats(query: any): Promise<any> {
+    const startDate = query.startDate
+      ? new Date(query.startDate)
+      : new Date(2020, 0, 1);
     const endDate = query.endDate ? new Date(query.endDate) : new Date();
 
     // Total leads
@@ -220,26 +153,6 @@ export default class LeadService {
       byStatus[stat._id] = stat.count;
     });
 
-    // Stats by source
-    const sourceStats = await leadModel.aggregate([
-      {
-        $match: {
-          created_at: { $gte: startDate, $lte: endDate },
-        },
-      },
-      {
-        $group: {
-          _id: "$lead_source",
-          count: { $sum: 1 },
-        },
-      },
-    ]);
-
-    const bySource: Record<string, number> = {};
-    sourceStats.forEach((stat) => {
-      bySource[stat._id] = stat.count;
-    });
-
     // Daily stats
     const dailyStats = await leadModel.aggregate([
       {
@@ -256,7 +169,7 @@ export default class LeadService {
         },
       },
       {
-        $sort: { "_id": 1 },
+        $sort: { _id: 1 },
       },
     ]);
 
@@ -269,19 +182,19 @@ export default class LeadService {
     const monthlyStats = await leadModel.aggregate([
       {
         $match: {
-          createdAt: { $gte: startDate, $lte: endDate },
+          created_at: { $gte: startDate, $lte: endDate },
         },
       },
       {
         $group: {
           _id: {
-            $dateToString: { format: "%Y-%m", date: "$createdAt" },
+            $dateToString: { format: "%Y-%m", date: "$created_at" },
           },
           count: { $sum: 1 },
         },
       },
       {
-        $sort: { "_id": 1 },
+        $sort: { _id: 1 },
       },
     ]);
 
@@ -294,19 +207,19 @@ export default class LeadService {
     const yearlyStats = await leadModel.aggregate([
       {
         $match: {
-          createdAt: { $gte: startDate, $lte: endDate },
+          created_at: { $gte: startDate, $lte: endDate },
         },
       },
       {
         $group: {
           _id: {
-            $dateToString: { format: "%Y", date: "$createdAt" },
+            $dateToString: { format: "%Y", date: "$created_at" },
           },
           count: { $sum: 1 },
         },
       },
       {
-        $sort: { "_id": 1 },
+        $sort: { _id: 1 },
       },
     ]);
 
@@ -318,7 +231,6 @@ export default class LeadService {
     return {
       total,
       byStatus,
-      bySource,
       byDate: {
         daily,
         monthly,

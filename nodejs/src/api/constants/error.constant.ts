@@ -71,4 +71,10 @@ export const errorResponses = {
     "Lead not found",
     "Lead with this ID does not exist",
   ] as ErrorResponseItem,
+
+  EMAIL_DAILY_LIMIT_EXCEEDED: [
+    HttpStatus.TOO_MANY_REQUESTS,
+    "Daily limit exceeded",
+    "This email has reached the daily limit of 3 submissions",
+  ] as ErrorResponseItem,
 };

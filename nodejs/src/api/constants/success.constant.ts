@@ -53,4 +53,23 @@ export const successResponses = {
     "Created",
     "Resource created successfully",
   ] as SuccessResponseItem,
+
+  // Lead success
+  LEAD_CREATE_SUCCESS: [
+    HttpStatus.CREATED,
+    "Lead Created",
+    "Lead created successfully",
+  ] as SuccessResponseItem,
+
+  LEAD_GET_SUCCESS: [
+    HttpStatus.OK,
+    "Lead Retrieved",
+    "Lead retrieved successfully",
+  ] as SuccessResponseItem,
+
+  LEAD_STATS_SUCCESS: [
+    HttpStatus.OK,
+    "Lead Stats Retrieved",
+    "Lead statistics retrieved successfully",
+  ] as SuccessResponseItem,
 };
