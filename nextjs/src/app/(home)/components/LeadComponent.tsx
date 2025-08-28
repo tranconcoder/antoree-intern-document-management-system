@@ -281,7 +281,7 @@ export default function LeadComponent() {
                   required
                   value={formData.lead_name}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors placeholder-gray-500 ${
                     fieldErrors.lead_name
                       ? "border-red-300 bg-red-50"
                       : "border-gray-300"
@@ -310,7 +310,7 @@ export default function LeadComponent() {
                   required
                   value={formData.lead_email}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors placeholder-gray-500 ${
                     fieldErrors.lead_email
                       ? "border-red-300 bg-red-50"
                       : "border-gray-300"
@@ -338,7 +338,7 @@ export default function LeadComponent() {
                   name="lead_phone"
                   value={formData.lead_phone}
                   onChange={handleInputChange}
-                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors ${
+                  className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors placeholder-gray-500 ${
                     fieldErrors.lead_phone
                       ? "border-red-300 bg-red-50"
                       : "border-gray-300"
@@ -366,7 +366,7 @@ export default function LeadComponent() {
                   name="lead_company"
                   value={formData.lead_company}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors placeholder-gray-500"
                   placeholder="Nhập tên công ty (nếu có)"
                 />
               </div>
@@ -384,7 +384,7 @@ export default function LeadComponent() {
                   rows={4}
                   value={formData.lead_message}
                   onChange={handleInputChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none placeholder-gray-500"
                   placeholder="Hãy cho chúng tôi biết nhu cầu của bạn..."
                 />
               </div>
