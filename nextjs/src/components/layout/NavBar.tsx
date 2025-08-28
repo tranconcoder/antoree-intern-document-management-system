@@ -7,6 +7,7 @@ import { FaCircleUser } from "react-icons/fa6";
 import { HiHome } from "react-icons/hi";
 import { IoDocumentText, IoSettingsSharp } from "react-icons/io5";
 import { BiLogOut } from "react-icons/bi";
+import { MdAdminPanelSettings } from "react-icons/md";
 import ProfileBox from "@/app/(home)/ProfileBox";
 
 export default function NavBar() {
@@ -27,6 +28,11 @@ export default function NavBar() {
       title: "Cài đặt",
       href: "/settings",
       icon: <IoSettingsSharp className="w-5 h-5" />,
+    },
+    {
+      title: "Admin",
+      href: "/admin",
+      icon: <MdAdminPanelSettings className="w-5 h-5" />,
     },
   ];
 
