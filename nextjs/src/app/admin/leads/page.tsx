@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { IoMail, IoSearch, IoTrash } from "react-icons/io5";
+import { IoMail, IoSearch, IoTrash, IoClose } from "react-icons/io5";
 import axios from "@/services/axios.service";
 
 interface Lead {
@@ -57,6 +57,8 @@ export default function LeadsPage() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
 
   const loadLeads = async () => {
     setLoading(true);
@@ -114,12 +116,21 @@ export default function LeadsPage() {
   };
 
   const deleteLead = async (leadId: string) => {
-    const ok = window.confirm("Xác nhận xóa lead này?");
-    if (!ok) return;
+    const lead = leads.find((l) => l.id === leadId);
+    if (lead) {
+      setLeadToDelete(lead);
+      setShowDeleteModal(true);
+    }
+  };
+
+  const confirmDelete = async () => {
+    if (!leadToDelete) return;
+
     try {
       setActionError(null);
-      setDeletingId(leadId);
-      await axios.delete(`/leads/${leadId}`);
+      setDeletingId(leadToDelete.id);
+      setShowDeleteModal(false);
+      await axios.delete(`/leads/${leadToDelete.id}`);
       setActionMessage("Xóa lead thành công");
       await loadLeads();
     } catch (err: any) {
@@ -129,8 +140,14 @@ export default function LeadsPage() {
       );
     } finally {
       setDeletingId(null);
+      setLeadToDelete(null);
       setTimeout(() => setActionMessage(null), 2500);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setLeadToDelete(null);
   };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -294,6 +311,63 @@ export default function LeadsPage() {
             >
               Next
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && leadToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl max-w-md mx-4 w-full">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Xác nhận xóa
+                </h3>
+                <button
+                  onClick={cancelDelete}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  <IoClose className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-gray-600 mb-4">
+                  Bạn có chắc chắn muốn xóa lead này không?
+                </p>
+
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="font-medium text-gray-900">
+                    {leadToDelete.lead_name}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    {leadToDelete.lead_email}
+                  </div>
+                  {leadToDelete.lead_company && (
+                    <div className="text-sm text-gray-600">
+                      {leadToDelete.lead_company}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex space-x-3 justify-end">
+                <button
+                  onClick={cancelDelete}
+                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors"
+                >
+                  Hủy
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  disabled={deletingId === leadToDelete.id}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {deletingId === leadToDelete.id ? "Đang xóa..." : "Xóa"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
