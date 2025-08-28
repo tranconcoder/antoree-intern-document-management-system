@@ -2,7 +2,7 @@ import { errorResponses } from "@/constants/error.constant";
 import ErrorResponse from "@/core/error.core";
 import type { RequestHandler } from "express";
 import type { ZodSchema } from "zod/v3";
-import type { RequestSource } from "@/enums/requestSource.enum";
+import { RequestSource } from "@/enums/requestSource.enum";
 import type { ZodType } from "zod";
 import { catchAsyncExpress } from "./async.middleware.";
 
@@ -21,7 +21,9 @@ export default function validateZodPayload(
       });
     }
 
-    req[source] = result.data;
+    if (source !== RequestSource.Query) {
+      req[source] = result.data;
+    }
     next();
   });
 }

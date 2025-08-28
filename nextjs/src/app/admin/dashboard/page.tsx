@@ -69,8 +69,12 @@ export default function AdminDashboard() {
   const fetchLeadStats = async () => {
     try {
       const response = await axios.get("/leads/stats");
-      if (response.data && response.data.total !== undefined) {
-        return response.data.total;
+      if (
+        response.data &&
+        response.data.metadata &&
+        response.data.metadata.total !== undefined
+      ) {
+        return response.data.metadata.total;
       }
       return 0;
     } catch (error) {

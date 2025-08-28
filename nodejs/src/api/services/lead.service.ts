@@ -122,6 +122,49 @@ export default class LeadService {
     };
   }
 
+  public static async updateLeadStatus(
+    leadId: string,
+    status: string
+  ): Promise<any> {
+    const allowed = ["new", "contacted", "qualified", "converted", "lost"];
+    if (!allowed.includes(status)) {
+      throw new Error("Invalid status");
+    }
+
+    const updated = await leadModel
+      .findByIdAndUpdate(
+        leadId,
+        { lead_status: status, updated_at: new Date() },
+        { new: true }
+      )
+      .lean();
+
+    if (!updated) {
+      throw new Error("Lead not found");
+    }
+
+    return {
+      id: updated._id.toString(),
+      lead_name: updated.lead_name,
+      lead_email: updated.lead_email,
+      lead_phone: updated.lead_phone,
+      lead_company: updated.lead_company,
+      lead_message: updated.lead_message,
+      lead_status: updated.lead_status,
+      lead_tags: updated.lead_tags,
+      createdAt: updated.created_at,
+      updatedAt: updated.updated_at,
+    };
+  }
+
+  public static async deleteLead(leadId: string): Promise<{ id: string }> {
+    const deleted = await leadModel.findByIdAndDelete(leadId).lean();
+    if (!deleted) {
+      throw new Error("Lead not found");
+    }
+    return { id: deleted._id.toString() };
+  }
+
   public static async getLeadStats(query: any): Promise<any> {
     const startDate = query.startDate
       ? new Date(query.startDate)

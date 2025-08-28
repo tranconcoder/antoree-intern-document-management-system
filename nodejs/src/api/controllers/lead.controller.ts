@@ -21,6 +21,7 @@ export default new (class LeadController {
 
   public getLeads: Handler = async (req, res, next) => {
     const query = req.query as unknown as GetLeadsInput;
+    console.log({ query });
 
     new SuccessResponse({
       detail: "Leads retrieved successfully",
@@ -50,6 +51,39 @@ export default new (class LeadController {
       detail: "Lead stats retrieved successfully",
       successResponseItem: successResponses.LEAD_STATS_SUCCESS,
       metadata: await LeadService.getLeadStats(query),
+    }).sendResponse(res);
+  };
+
+  public updateLeadStatus: Handler = async (req, res, next) => {
+    const { leadId } = req.params;
+    const { status } = req.body as { status?: string };
+
+    if (!leadId) {
+      throw new Error("Lead ID required");
+    }
+
+    if (!status) {
+      throw new Error("Status is required");
+    }
+
+    new SuccessResponse({
+      detail: "Lead status updated",
+      successResponseItem: successResponses.LEAD_UPDATE_SUCCESS,
+      metadata: await LeadService.updateLeadStatus(leadId, status),
+    }).sendResponse(res);
+  };
+
+  public deleteLead: Handler = async (req, res, next) => {
+    const { leadId } = req.params;
+
+    if (!leadId) {
+      throw new Error("Lead ID required");
+    }
+
+    new SuccessResponse({
+      detail: "Lead deleted",
+      successResponseItem: successResponses.LEAD_DELETE_SUCCESS,
+      metadata: await LeadService.deleteLead(leadId),
     }).sendResponse(res);
   };
 })();

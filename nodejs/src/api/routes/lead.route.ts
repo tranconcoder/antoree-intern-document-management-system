@@ -31,4 +31,11 @@ leadRouter.get(
 
 leadRouter.get("/:leadId", catchAsyncExpress(leadController.getLeadById));
 
+leadRouter.patch(
+  "/:leadId/status",
+  catchAsyncExpress(leadController.updateLeadStatus)
+);
+
+leadRouter.delete("/:leadId", catchAsyncExpress(leadController.deleteLead));
+
 export default leadRouter;

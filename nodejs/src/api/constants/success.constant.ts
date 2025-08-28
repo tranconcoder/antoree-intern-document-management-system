@@ -67,6 +67,18 @@ export const successResponses = {
     "Lead retrieved successfully",
   ] as SuccessResponseItem,
 
+  LEAD_UPDATE_SUCCESS: [
+    HttpStatus.OK,
+    "Lead Updated",
+    "Lead updated successfully",
+  ] as SuccessResponseItem,
+
+  LEAD_DELETE_SUCCESS: [
+    HttpStatus.OK,
+    "Lead Deleted",
+    "Lead deleted successfully",
+  ] as SuccessResponseItem,
+
   LEAD_STATS_SUCCESS: [
     HttpStatus.OK,
     "Lead Stats Retrieved",
