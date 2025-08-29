@@ -1,5 +1,6 @@
 import documentModel from "@/models/document.model";
 import type { UploadDocumentBody } from "@/validator/zod/document.zod";
+import mongoose from "mongoose";
 
 export default new (class DocumentService {
   async uploadDocuments(
@@ -35,5 +36,51 @@ export default new (class DocumentService {
 
   async getPublicDocuments() {
     return documentModel.find({ isPublic: true }, { "files.data": 0 });
+  }
+
+  async getDocumentById(documentId: string) {
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(documentId)) {
+      throw new Error("Invalid document ID format");
+    }
+
+    const document = await documentModel.findById(documentId, {
+      "files.data": 0,
+    });
+
+    if (!document) {
+      throw new Error("Document not found");
+    }
+
+    return document;
+  }
+
+  async getDocumentFileData(documentId: string) {
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(documentId)) {
+      throw new Error("Invalid document ID format");
+    }
+
+    const document = await documentModel.findById(documentId, {
+      files: 1,
+      _id: 1,
+    });
+
+    if (!document) {
+      throw new Error("Document not found");
+    }
+
+    // Convert file data from Buffer to base64 for frontend
+    const filesWithBase64Data = document.files.map((file) => ({
+      data: file.data.toString("base64"),
+      contentType: file.contentType,
+      fileSize: file.fileSize,
+      fileName: file.fileName,
+    }));
+
+    return {
+      _id: document._id,
+      files: filesWithBase64Data,
+    };
   }
 })();

@@ -1,6 +1,6 @@
 export interface DocumentFile {
   data?: string;
-  contentType: string;
+  contentType?: string;
   fileSize: number;
   fileName: string;
 }
@@ -14,8 +14,8 @@ export interface Document {
   files: DocumentFile[];
   isPremium: boolean;
   isPublic: boolean;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 // API Response types
@@ -24,9 +24,21 @@ export interface GetDocumentsResponse {
 }
 
 export interface GetDocumentResponse {
-  success: boolean;
-  data: Document;
-  message?: string;
+  metadata: Document;
+  successHttpCode: number;
+}
+
+export interface GetDocumentFileDataResponse {
+  success?: boolean;
+  successHttpCode?: number;
+  metadata: {
+    files: Array<{
+      data: string;
+      contentType: string;
+      fileSize: number;
+      fileName: string;
+    }>;
+  };
 }
 
 export interface DeleteDocumentResponse {

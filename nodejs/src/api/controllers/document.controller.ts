@@ -29,4 +29,22 @@ export default new (class DocumentController {
       metadata: await documentService.getPublicDocuments(),
     }).sendResponse(res);
   };
+
+  getDocumentById: RequestHandler = async (req, res) => {
+    const { id } = req.params;
+
+    new SuccessResponse({
+      successResponseItem: successResponses.DOCUMENT_FETCH_SUCCESS,
+      metadata: await documentService.getDocumentById(id as string),
+    }).sendResponse(res);
+  };
+
+  getDocumentFileData: RequestHandler = async (req, res) => {
+    const { id } = req.params;
+
+    new SuccessResponse({
+      successResponseItem: successResponses.DOCUMENT_FETCH_SUCCESS,
+      metadata: await documentService.getDocumentFileData(id as string),
+    }).sendResponse(res);
+  };
 })();

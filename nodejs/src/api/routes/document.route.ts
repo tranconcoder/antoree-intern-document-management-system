@@ -20,4 +20,8 @@ documentRouter.get("/self", validateToken, documentController.getSelfDocuments);
 
 documentRouter.get("/public", documentController.getPublicDocuments);
 
+documentRouter.get("/:id", documentController.getDocumentById);
+
+documentRouter.get("/:id/file-data", documentController.getDocumentFileData);
+
 export default documentRouter;
