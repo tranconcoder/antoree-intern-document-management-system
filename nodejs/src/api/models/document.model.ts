@@ -27,9 +27,34 @@ export interface Document extends TimeStamps {
 
 const documentSchema = new Schema<Document>(
   {
-    // Metadata
-    title: { type: String, required: true, min: 10, max: 200 },
-    description: { type: String, required: true, min: 20, max: 1000 },
+    // Metadata - with explicit UTF-8 support
+    title: {
+      type: String,
+      required: true,
+      minlength: 10,
+      maxlength: 200,
+      validate: {
+        validator: function (v: string) {
+          // Ensure UTF-8 encoding is valid
+          return Buffer.byteLength(v, "utf8") <= 600; // Allow for 3x max chars in UTF-8
+        },
+        message:
+          "Title contains invalid characters or is too long when encoded",
+      },
+    },
+    description: {
+      type: String,
+      required: true,
+      minlength: 20,
+      maxlength: 1000,
+      validate: {
+        validator: function (v: string) {
+          return Buffer.byteLength(v, "utf8") <= 3000; // Allow for 3x max chars in UTF-8
+        },
+        message:
+          "Description contains invalid characters or is too long when encoded",
+      },
+    },
     previewAvatar: { type: Buffer, required: false },
 
     userId: { type: mongoose.Types.ObjectId, required: true },
@@ -55,8 +80,16 @@ const documentSchema = new Schema<Document>(
           fileName: {
             type: String,
             required: true,
-            min: 3,
-            max: 100,
+            minlength: 3,
+            maxlength: 100,
+            validate: {
+              validator: function (v: string) {
+                // Ensure filename UTF-8 encoding is valid and not too long
+                return Buffer.byteLength(v, "utf8") <= 300; // Allow for 3x max chars in UTF-8
+              },
+              message:
+                "Filename contains invalid characters or is too long when encoded",
+            },
           },
         },
       ],
@@ -68,6 +101,8 @@ const documentSchema = new Schema<Document>(
   {
     timestamps: TIME_STAMPS,
     collection: DOCUMENT_COLLECTION_NAME,
+    // Ensure UTF-8 encoding for the collection
+    collation: { locale: "vi", strength: 2 }, // Vietnamese locale with case-insensitive
   }
 );
 

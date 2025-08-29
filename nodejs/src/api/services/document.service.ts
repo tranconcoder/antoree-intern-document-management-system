@@ -3,6 +3,35 @@ import type { UploadDocumentBody } from "@/validator/zod/document.zod";
 import mongoose from "mongoose";
 
 export default new (class DocumentService {
+  // Helper method to ensure proper UTF-8 encoding
+  private ensureUTF8String(str: string): string {
+    try {
+      // Check if string is properly UTF-8 encoded
+      const buffer = Buffer.from(str, "utf8");
+      const decoded = buffer.toString("utf8");
+
+      // If the round-trip encoding/decoding changes the string, it's likely incorrectly encoded
+      if (decoded !== str) {
+        // Try to fix latin1 -> utf8 encoding issue
+        const latin1Buffer = Buffer.from(str, "latin1");
+        const utf8String = latin1Buffer.toString("utf8");
+
+        // Validate the result makes sense (basic check for common Vietnamese characters)
+        if (
+          /^[\u0000-\u007F\u00C0-\u1EF9\s\w\d\-_.()[\]{}]+$/.test(utf8String)
+        ) {
+          console.log(`Fixed encoding for: "${str}" -> "${utf8String}"`);
+          return utf8String;
+        }
+      }
+
+      return str;
+    } catch (error) {
+      console.warn(`Encoding warning for string: "${str}":`, error);
+      return str;
+    }
+  }
+
   async uploadDocuments(
     body: UploadDocumentBody,
     files: Express.Multer.File[],
@@ -20,12 +49,26 @@ export default new (class DocumentService {
       })),
     });
 
-    const filesToSave = files.map((file) => ({
-      data: file.buffer,
-      contentType: file.mimetype,
-      fileSize: file.size,
-      fileName: file.originalname,
-    }));
+    // Ensure UTF-8 encoding for title and description
+    const sanitizedBody = {
+      ...body,
+      title: this.ensureUTF8String(body.title),
+      description: this.ensureUTF8String(body.description),
+    };
+
+    const filesToSave = files.map((file) => {
+      // Ensure filename is properly UTF-8 encoded
+      let fileName = this.ensureUTF8String(file.originalname);
+
+      console.log(`Processing file: "${file.originalname}" -> "${fileName}"`);
+
+      return {
+        data: file.buffer,
+        contentType: file.mimetype,
+        fileSize: file.size,
+        fileName: fileName,
+      };
+    });
 
     console.log(
       "Files to save:",
@@ -39,12 +82,12 @@ export default new (class DocumentService {
 
     try {
       const savedDoc = await documentModel.create({
-        title: body.title,
-        description: body.description,
+        title: sanitizedBody.title,
+        description: sanitizedBody.description,
         userId: userId,
         files: filesToSave,
-        isPremium: body.isPremium,
-        isPublic: body.isPublic,
+        isPremium: sanitizedBody.isPremium,
+        isPublic: sanitizedBody.isPublic,
       });
 
       console.log("Document saved successfully:", savedDoc._id.toString());

@@ -21,8 +21,21 @@ app.use(compression());
 app.use(cors(CORS_OPTIONS));
 
 // Express middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "10mb" }));
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: "10mb",
+    parameterLimit: 50000,
+  })
+);
+
+// Ensure UTF-8 encoding for all responses
+app.use((req, res, next) => {
+  res.charset = "utf-8";
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  next();
+});
 
 // Connect to database
 const mongoDB = MongoDBConnectivity.getInstance();

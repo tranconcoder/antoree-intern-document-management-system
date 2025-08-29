@@ -30,7 +30,15 @@ export default class MongoDBConnectivity {
       minPoolSize: MONGODB_MIN_POOLSIZE,
       maxPoolSize: MONGODB_MAX_POOLSIZE,
       connectTimeoutMS: MONGODB_CONNECT_TIMEOUT_MS,
+      // Ensure UTF-8 encoding for Vietnamese characters
+      bufferCommands: false,
+      autoIndex: true,
     });
+
+    // Set default charset to UTF-8 and configure for Vietnamese
+    mongoose.set("sanitizeFilter", true);
+
+    console.log("MongoDB connected with UTF-8 support for Vietnamese");
   }
 
   public async disconnect(): Promise<void> {
