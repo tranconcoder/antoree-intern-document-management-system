@@ -8,6 +8,18 @@ export default new (class DocumentService {
     files: Express.Multer.File[],
     userId: string
   ) {
+    console.log("Upload documents service called:", {
+      bodyTitle: body.title,
+      filesCount: files.length,
+      userId,
+      files: files.map((f) => ({
+        originalname: f.originalname,
+        mimetype: f.mimetype,
+        size: f.size,
+        bufferLength: f.buffer?.length,
+      })),
+    });
+
     const filesToSave = files.map((file) => ({
       data: file.buffer,
       contentType: file.mimetype,
@@ -15,19 +27,32 @@ export default new (class DocumentService {
       fileName: file.originalname,
     }));
 
-    const savedDoc = await documentModel.create({
-      title: body.title,
-      description: body.description,
+    console.log(
+      "Files to save:",
+      filesToSave.map((f) => ({
+        fileName: f.fileName,
+        contentType: f.contentType,
+        fileSize: f.fileSize,
+        hasData: !!f.data,
+      }))
+    );
 
-      userId: userId,
+    try {
+      const savedDoc = await documentModel.create({
+        title: body.title,
+        description: body.description,
+        userId: userId,
+        files: filesToSave,
+        isPremium: body.isPremium,
+        isPublic: body.isPublic,
+      });
 
-      files: filesToSave,
-
-      isPremium: body.isPremium,
-      isPublic: body.isPublic,
-    });
-
-    return savedDoc._id.toString();
+      console.log("Document saved successfully:", savedDoc._id.toString());
+      return savedDoc._id.toString();
+    } catch (error) {
+      console.error("Error saving document:", error);
+      throw error;
+    }
   }
 
   async getSelfDocuments(userId: string) {

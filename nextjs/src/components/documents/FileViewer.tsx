@@ -44,8 +44,30 @@ export default function FileViewer({ file, onClose }: FileViewerProps) {
   const isWord =
     file.contentType?.includes("word") ||
     file.contentType?.includes("document") ||
-    file.fileName.endsWith(".docx") ||
-    file.fileName.endsWith(".doc");
+    file.contentType?.includes("wordprocessingml") ||
+    file.contentType?.includes("msword") ||
+    file.contentType?.includes("wps-office.docx") ||
+    file.contentType ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+    file.contentType === "application/msword" ||
+    file.contentType === "application/wps-office.docx" ||
+    file.fileName.toLowerCase().endsWith(".docx") ||
+    file.fileName.toLowerCase().endsWith(".doc");
+
+  console.log("File type detection:", {
+    fileName: file.fileName,
+    contentType: file.contentType,
+    isPDF,
+    isWord,
+    fileNameLower: file.fileName.toLowerCase(),
+    endsWithDocx: file.fileName.toLowerCase().endsWith(".docx"),
+    endsWithDoc: file.fileName.toLowerCase().endsWith(".doc"),
+    isExactDocxMime:
+      file.contentType ===
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    isExactDocMime: file.contentType === "application/msword",
+    isWpsDocxMime: file.contentType === "application/wps-office.docx",
+  });
 
   useEffect(() => {
     console.log("FileViewer effect triggered:", {
@@ -100,9 +122,17 @@ export default function FileViewer({ file, onClose }: FileViewerProps) {
         throw new Error("Word document data is missing or invalid");
       }
 
+      // Validate base64 format
+      const base64Regex = /^[A-Za-z0-9+/\s]*={0,2}$/;
+      const cleanBase64 = file.data.replace(/\s/g, "");
+
+      if (!base64Regex.test(cleanBase64) || cleanBase64.length < 100) {
+        throw new Error("Invalid base64 data format");
+      }
+
       // Convert base64 to array buffer
       console.log("Converting base64 to array buffer...");
-      const byteCharacters = atob(file.data);
+      const byteCharacters = atob(cleanBase64);
       const byteNumbers = new Array(byteCharacters.length);
       for (let i = 0; i < byteCharacters.length; i++) {
         byteNumbers[i] = byteCharacters.charCodeAt(i);
@@ -110,13 +140,50 @@ export default function FileViewer({ file, onClose }: FileViewerProps) {
       const arrayBuffer = new Uint8Array(byteNumbers).buffer;
       console.log("Array buffer created, size:", arrayBuffer.byteLength);
 
-      // Convert Word document to HTML
+      // Convert Word document to HTML with better options
       console.log("Converting Word to HTML...");
-      const result = await mammoth.convertToHtml({ arrayBuffer });
-      console.log(
-        "Word conversion successful, content length:",
-        result.value.length
+      const result = await mammoth.convertToHtml(
+        {
+          arrayBuffer,
+        },
+        {
+          styleMap: [
+            "p[style-name='Heading 1'] => h1:fresh",
+            "p[style-name='Heading 2'] => h2:fresh",
+            "p[style-name='Heading 3'] => h3:fresh",
+            "p[style-name='Heading 4'] => h4:fresh",
+            "p[style-name='Title'] => h1.title:fresh",
+            "p[style-name='Subtitle'] => h2.subtitle:fresh",
+          ],
+          ignoreEmptyParagraphs: false,
+          convertImage: mammoth.images.imgElement(function (image) {
+            return image.read("base64").then(function (imageBuffer) {
+              return {
+                src: "data:" + image.contentType + ";base64," + imageBuffer,
+              };
+            });
+          }),
+        }
       );
+
+      console.log("Word conversion successful:", {
+        contentLength: result.value.length,
+        messagesCount: result.messages.length,
+        hasWarnings: result.messages.some((m) => m.type === "warning"),
+        hasErrors: result.messages.some((m) => m.type === "error"),
+      });
+
+      // Log any conversion messages for debugging
+      if (result.messages.length > 0) {
+        console.log("Mammoth conversion messages:", result.messages);
+      }
+
+      if (!result.value || result.value.trim().length === 0) {
+        throw new Error(
+          "Document appears to be empty or could not be converted"
+        );
+      }
+
       setWordContent(result.value);
     } catch (err: any) {
       console.error("Error loading Word document:", err);
@@ -173,6 +240,13 @@ export default function FileViewer({ file, onClose }: FileViewerProps) {
 
   // If not PDF or Word, show not supported message
   if (!isPDF && !isWord) {
+    console.log("File not supported - Debug info:", {
+      fileName: file.fileName,
+      contentType: file.contentType,
+      isPDF,
+      isWord,
+    });
+
     return (
       <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
         <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-4 p-6">
@@ -191,6 +265,10 @@ export default function FileViewer({ file, onClose }: FileViewerProps) {
             File này không hỗ trợ hiển thị trực tiếp. Chỉ hỗ trợ PDF và Word
             documents.
           </p>
+          <div className="text-xs text-gray-500 mb-4 p-2 bg-gray-50 rounded">
+            <div>File: {file.fileName}</div>
+            <div>Type: {file.contentType || "Không xác định"}</div>
+          </div>
           <div className="flex justify-end">
             <button
               onClick={onClose}
@@ -222,12 +300,14 @@ export default function FileViewer({ file, onClose }: FileViewerProps) {
           </div>
         </div>
 
-        {/* Controls for PDF */}
-        {isPDF && (
+        {/* Controls for PDF and Word */}
+        {(isPDF || isWord) && (
           <div className="flex items-center space-x-2">
+            {/* Zoom controls for both PDF and Word */}
             <button
               onClick={handleZoomOut}
               className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg"
+              title="Phóng to"
             >
               <IoRemove className="w-4 h-4" />
             </button>
@@ -237,17 +317,20 @@ export default function FileViewer({ file, onClose }: FileViewerProps) {
             <button
               onClick={handleZoomIn}
               className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg"
+              title="Thu nhỏ"
             >
               <IoAdd className="w-4 h-4" />
             </button>
 
-            {numPages && (
+            {/* Page navigation only for PDF */}
+            {isPDF && numPages && (
               <>
                 <div className="w-px h-6 bg-gray-300 mx-2"></div>
                 <button
                   onClick={handlePrevPage}
                   disabled={pageNumber <= 1}
                   className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Trang trước"
                 >
                   <IoArrowBack className="w-4 h-4" />
                 </button>
@@ -258,9 +341,18 @@ export default function FileViewer({ file, onClose }: FileViewerProps) {
                   onClick={handleNextPage}
                   disabled={pageNumber >= numPages}
                   className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  title="Trang sau"
                 >
                   <IoArrowForward className="w-4 h-4" />
                 </button>
+              </>
+            )}
+
+            {/* Word document info */}
+            {isWord && !loading && !error && wordContent && (
+              <>
+                <div className="w-px h-6 bg-gray-300 mx-2"></div>
+                <span className="text-sm text-gray-600">Word Document</span>
               </>
             )}
           </div>
@@ -363,12 +455,110 @@ export default function FileViewer({ file, onClose }: FileViewerProps) {
 
         {/* Word Viewer */}
         {isWord && !loading && !error && wordContent && (
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white shadow-lg rounded-lg p-8 min-h-[600px]">
-              <div
-                className="prose prose-sm max-w-none"
-                dangerouslySetInnerHTML={{ __html: wordContent }}
-              />
+          <div className="flex justify-center">
+            <div
+              className="bg-white shadow-lg rounded-lg overflow-hidden max-w-5xl w-full"
+              style={{
+                transform: `scale(${scale})`,
+                transformOrigin: "top center",
+                transition: "transform 0.2s ease-in-out",
+              }}
+            >
+              <div className="p-8 min-h-[800px]">
+                <style jsx>{`
+                  .word-content h1 {
+                    font-size: 2rem;
+                    font-weight: bold;
+                    margin: 1.5rem 0 1rem 0;
+                    color: #1a202c;
+                  }
+                  .word-content h2 {
+                    font-size: 1.5rem;
+                    font-weight: bold;
+                    margin: 1.25rem 0 0.75rem 0;
+                    color: #2d3748;
+                  }
+                  .word-content h3 {
+                    font-size: 1.25rem;
+                    font-weight: bold;
+                    margin: 1rem 0 0.5rem 0;
+                    color: #4a5568;
+                  }
+                  .word-content h4 {
+                    font-size: 1.125rem;
+                    font-weight: bold;
+                    margin: 0.75rem 0 0.5rem 0;
+                    color: #4a5568;
+                  }
+                  .word-content p {
+                    margin: 0.75rem 0;
+                    line-height: 1.6;
+                  }
+                  .word-content ul,
+                  .word-content ol {
+                    margin: 0.75rem 0;
+                    padding-left: 1.5rem;
+                  }
+                  .word-content li {
+                    margin: 0.25rem 0;
+                  }
+                  .word-content table {
+                    border-collapse: collapse;
+                    width: 100%;
+                    margin: 1rem 0;
+                  }
+                  .word-content td,
+                  .word-content th {
+                    border: 1px solid #e2e8f0;
+                    padding: 0.5rem;
+                    text-align: left;
+                  }
+                  .word-content th {
+                    background-color: #f7fafc;
+                    font-weight: bold;
+                  }
+                  .word-content img {
+                    max-width: 100%;
+                    height: auto;
+                    margin: 1rem 0;
+                  }
+                  .word-content strong {
+                    font-weight: bold;
+                  }
+                  .word-content em {
+                    font-style: italic;
+                  }
+                  .word-content u {
+                    text-decoration: underline;
+                  }
+                `}</style>
+                <div
+                  className="word-content prose prose-lg max-w-none"
+                  style={{
+                    fontFamily: 'Georgia, "Times New Roman", serif',
+                    lineHeight: "1.6",
+                    color: "#333",
+                  }}
+                  dangerouslySetInnerHTML={{ __html: wordContent }}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Empty state for Word when no content */}
+        {isWord && !loading && !error && !wordContent && (
+          <div className="flex items-center justify-center h-full">
+            <div className="bg-white rounded-lg shadow-lg p-8 text-center max-w-md">
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-blue-600 text-xl">📄</span>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                Tài liệu trống
+              </h3>
+              <p className="text-gray-600">
+                Tài liệu Word này không có nội dung để hiển thị.
+              </p>
             </div>
           </div>
         )}

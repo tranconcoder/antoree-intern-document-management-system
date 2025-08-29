@@ -5,6 +5,7 @@ export enum FileType {
   // Word
   WORD_DOC = "application/msword",
   WORD_DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  WORD_WPS_DOCX = "application/wps-office.docx", // WPS Office DOCX format
 
   // Excel
   EXCEL_XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -32,6 +33,7 @@ export const getFileExtension = (mimeType: string): string => {
     case FileType.WORD_DOC:
       return ".doc";
     case FileType.WORD_DOCX:
+    case FileType.WORD_WPS_DOCX:
       return ".docx";
     case FileType.EXCEL_XLSX:
       return ".xlsx";
@@ -51,6 +53,7 @@ export const getFileCategory = (mimeType: string): string => {
       return "PDF";
     case FileType.WORD_DOC:
     case FileType.WORD_DOCX:
+    case FileType.WORD_WPS_DOCX:
       return "Word";
     case FileType.EXCEL_XLSX:
       return "Excel";

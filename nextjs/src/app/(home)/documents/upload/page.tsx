@@ -89,12 +89,41 @@ export default function UploadPage() {
   // Validate single file
   const validateFile = useCallback(
     (file: File): string | null => {
+      console.log("=== File Validation Debug ===");
+      console.log("File name:", file.name);
+      console.log("File type (MIME):", file.type);
+      console.log("File size:", file.size);
+      console.log("Supported types:", getAllFileTypes());
+      console.log("Is supported:", isSupportedFileType(file.type));
+
       if (isFileAlreadySelected(file)) {
         return "File này đã được chọn rồi.";
       }
+
+      // Check by MIME type first
       if (!isSupportedFileType(file.type)) {
-        return "Loại file không được hỗ trợ. Chỉ chấp nhận PDF, Word, Excel, PowerPoint.";
+        // Fallback: check by file extension if MIME type fails
+        const fileName = file.name.toLowerCase();
+        const isValidExtension =
+          fileName.endsWith(".pdf") ||
+          fileName.endsWith(".doc") ||
+          fileName.endsWith(".docx") ||
+          fileName.endsWith(".xlsx") ||
+          fileName.endsWith(".ppt") ||
+          fileName.endsWith(".pptx");
+
+        console.log("MIME type not supported, checking extension:", {
+          fileName,
+          isValidExtension,
+        });
+
+        if (!isValidExtension) {
+          return "Loại file không được hỗ trợ. Chỉ chấp nhận PDF, Word, Excel, PowerPoint.";
+        } else {
+          console.log("File accepted by extension fallback");
+        }
       }
+
       if (file.size < UPLOAD_CONFIG.MIN_FILE_SIZE) {
         return `File quá nhỏ. Kích thước tối thiểu là ${formatFileSize(
           UPLOAD_CONFIG.MIN_FILE_SIZE

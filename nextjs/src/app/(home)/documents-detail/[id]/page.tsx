@@ -158,14 +158,43 @@ export default function DocumentDetailPage() {
       return false;
     }
 
+    // Check by content type first
     const previewableTypes = [
       "application/pdf",
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
       "application/msword", // .doc
+      "application/wps-office.docx", // WPS Office .docx
     ];
 
-    const canPreviewFile = previewableTypes.includes(type);
-    console.log("Can preview:", canPreviewFile);
+    // Check if content type is directly supported
+    if (previewableTypes.includes(type)) {
+      console.log("Can preview by content type:", true);
+      return true;
+    }
+
+    // Check by file extension as fallback
+    const lowerFileName = fileName.toLowerCase();
+    const isWordFile =
+      lowerFileName.endsWith(".docx") || lowerFileName.endsWith(".doc");
+    const isPdfFile = lowerFileName.endsWith(".pdf");
+
+    // Additional checks for Word files with generic content types
+    const isWordContentType =
+      type.includes("word") ||
+      type.includes("document") ||
+      type.includes("wordprocessingml") ||
+      type.includes("msword") ||
+      type.includes("wps-office");
+
+    const canPreviewFile = isPdfFile || isWordFile || isWordContentType;
+    console.log("Can preview by extension/content check:", canPreviewFile, {
+      isWordFile,
+      isPdfFile,
+      isWordContentType,
+      fileName: lowerFileName,
+      contentType: type,
+    });
+
     return canPreviewFile;
   };
 
@@ -371,7 +400,12 @@ export default function DocumentDetailPage() {
                       {canPreview(file.fileName, file.contentType) && (
                         <button
                           onClick={() => handleViewFile(file.fileName)}
-                          className="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium"
+                          className="inline-flex items-center px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium shadow-sm"
+                          title={`Xem trước ${
+                            file.contentType?.includes("pdf")
+                              ? "PDF"
+                              : "Word document"
+                          }`}
                         >
                           <IoEye className="w-3 h-3 mr-1" />
                           Xem trước
@@ -381,7 +415,8 @@ export default function DocumentDetailPage() {
                       <button
                         onClick={() => handleDownload(file.fileName, index)}
                         disabled={downloading === `${index}`}
-                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                        title="Tải xuống file"
                       >
                         {downloading === `${index}` ? (
                           <>
