@@ -112,7 +112,7 @@ export default function DocumentsPage() {
 
   const handleViewDocument = (documentId: string) => {
     // Open document details in a new tab or modal
-    window.open(`/documents-detail/${documentId}`, "_blank");
+    window.open(`/documents/${documentId}`, "_blank");
   };
 
   const handleRefresh = () => {
