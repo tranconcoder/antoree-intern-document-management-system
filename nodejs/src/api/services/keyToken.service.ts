@@ -28,6 +28,7 @@ export default class KeyTokenService {
    */
   public static async findKeyToken(userId: string, jti: string) {
     const keyToken = await keyTokenModel.findOne({ userId, jti });
+    console.log(keyToken);
 
     if (!keyToken)
       throw new ErrorResponse({

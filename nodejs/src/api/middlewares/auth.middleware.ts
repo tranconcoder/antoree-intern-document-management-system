@@ -3,7 +3,6 @@ import ErrorResponse from "@/core/error.core";
 import { JwtService } from "@/services/jwt.service";
 import type { RequestHandler } from "express";
 import { catchAsyncExpress } from "./async.middleware.";
-import type { ErrorResponseItem } from "@/types/error";
 import KeyTokenService from "@/services/keyToken.service";
 
 export const validateToken: RequestHandler = catchAsyncExpress(
@@ -13,11 +12,10 @@ export const validateToken: RequestHandler = catchAsyncExpress(
       if (!token) throw errorResponses.AUTH_TOKEN_NOT_FOUND;
 
       const accessToken = token.split(" ")[1];
-      console.log(accessToken);
       if (!accessToken) throw errorResponses.AUTH_TOKEN_NOT_FOUND;
 
       const decoded = JwtService.decode(accessToken);
-      console.log(decoded);
+      console.log({ decoded });
       if (!decoded) throw errorResponses.AUTH_TOKEN_NOT_FOUND;
 
       const { userId, jti } = decoded;
@@ -33,6 +31,10 @@ export const validateToken: RequestHandler = catchAsyncExpress(
 
       next();
     } catch (e: any) {
+      if (e instanceof ErrorResponse) {
+        throw e;
+      }
+
       throw new ErrorResponse({
         errorResponseItem: e,
       });

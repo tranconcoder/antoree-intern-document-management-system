@@ -12,6 +12,7 @@ export default class ErrorResponse {
   //   Get error message handler
   public get errorMessage(): string {
     const now = new Date();
+    console.log({ item: this.errorResponseItem });
 
     return `[${now.toISOString()}] [${this.errorResponseItem[0]}] ${
       this.errorResponseItem[1]

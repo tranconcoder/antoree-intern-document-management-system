@@ -19,25 +19,22 @@ const errorHandler: ErrorRequestHandler = (
   let errorResponse: ErrorResponse;
 
   try {
-    if (err instanceof Error) {
+    if (err instanceof ErrorResponse) {
+      errorResponse = err;
+      console.log({ errorError: errorResponse });
+    } else if (err instanceof Error) {
       errorResponse = new ErrorResponse({
         errorResponseItem: errorResponses.INTERNAL_SERVER_ERROR,
         detail: err.message,
       });
-    } else if (err instanceof ErrorResponse) {
-      errorResponse = err;
+      console.log({ errorResponse });
     } else {
       errorResponse = new ErrorResponse({
         errorResponseItem: errorResponses.INTERNAL_SERVER_ERROR,
         detail: "Unknown error occurred",
       });
+      console.log({ errorOther: errorResponse });
     }
-
-    console.log("Final error object:", {
-      errorMessage: errorResponse.errorMessage,
-      httpCode: errorResponse.getErrorHttpCode(),
-      error: errorResponse.getError(),
-    });
 
     const httpCode = errorResponse.getErrorHttpCode();
     if (
@@ -51,8 +48,6 @@ const errorHandler: ErrorRequestHandler = (
 
     res.status(httpCode).json(errorResponse.getError());
   } catch (handlerError) {
-    console.error("Error in error handler:", handlerError);
-
     // Fallback response
     res.status(500).json({
       errorHttpCode: 500,

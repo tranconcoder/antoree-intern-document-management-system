@@ -34,13 +34,13 @@ export const errorResponses = {
   ] as ErrorResponseItem,
 
   AUTH_KEY_TOKEN_NOT_FOUND: [
-    HttpStatus.NOT_FOUND,
+    HttpStatus.UNAUTHORIZED,
     "Key token not found",
     "Key token not found or expired",
   ] as ErrorResponseItem,
 
   AUTH_USER_NOT_FOUND: [
-    HttpStatus.NOT_FOUND,
+    HttpStatus.UNAUTHORIZED,
     "User not found",
     "User with this email does not exist",
   ] as ErrorResponseItem,
@@ -52,7 +52,7 @@ export const errorResponses = {
   ] as ErrorResponseItem,
 
   AUTH_TOKEN_NOT_FOUND: [
-    HttpStatus.NOT_FOUND,
+    HttpStatus.UNAUTHORIZED,
     "Token not found",
     "Authorization token not found",
   ] as ErrorResponseItem,
