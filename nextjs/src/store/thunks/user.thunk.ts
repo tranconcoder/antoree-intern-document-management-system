@@ -4,7 +4,6 @@ import { axiosInstance } from "@/services";
 import { LoginResponse } from "@/types/response";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { HttpStatusCode } from "axios";
-import { persistor } from "..";
 
 export const fetchLogin = createAsyncThunk(
   "user/fetchLogin",
@@ -41,6 +40,9 @@ export const fetchRegister = createAsyncThunk(
 export const logoutUser = createAsyncThunk(
   "user/logout",
   async (_, { dispatch }) => {
+    // Import persistor dynamically to avoid circular dependency
+    const { persistor } = await import("../store");
+
     // Clear persisted state
     await persistor.purge();
 

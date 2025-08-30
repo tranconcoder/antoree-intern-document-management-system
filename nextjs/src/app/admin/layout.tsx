@@ -12,6 +12,7 @@ import {
   IoLogOut,
   IoNotifications,
   IoSearch,
+  IoDiamond,
 } from "react-icons/io5";
 import ProfileBoxAdmin from "./components/ProfileBoxAdmin";
 
@@ -34,6 +35,12 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       icon: IoPeople,
       label: "Leads",
       active: pathname === "/admin/leads",
+    },
+    {
+      href: "/admin/premium-analytics",
+      icon: IoDiamond,
+      label: "Premium Analytics",
+      active: pathname === "/admin/premium-analytics",
     },
   ];
 
@@ -103,6 +110,8 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
               <h2 className="text-xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                 {pathname === "/admin/dashboard" && "📊 Dashboard"}
                 {pathname === "/admin/leads" && "👥 Quản lý Leads"}
+                {pathname === "/admin/premium-analytics" &&
+                  "💎 Thống kê Premium"}
               </h2>
               <div className="hidden md:block">
                 <span className="px-3 py-1 bg-gradient-to-r from-blue-100 to-indigo-100 text-blue-700 text-xs font-semibold rounded-full">

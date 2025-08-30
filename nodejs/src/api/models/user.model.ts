@@ -18,6 +18,12 @@ export interface User extends TimeStamps {
   user_gender: boolean;
   user_dayOfBirth: Date;
   user_premiumTicket?: string;
+
+  // New premium fields
+  isPremium?: boolean;
+  premiumPlan?: "monthly" | "yearly" | "lifetime";
+  premiumStartDate?: Date;
+  premiumEndDate?: Date;
 }
 
 export const userSchema = new Schema<User>(
@@ -33,6 +39,16 @@ export const userSchema = new Schema<User>(
       type: Schema.Types.ObjectId,
       ref: PREMIUM_TICKET_DOCUMENT_NAME,
     },
+
+    // New premium fields
+    isPremium: { type: Boolean, default: false },
+    premiumPlan: {
+      type: String,
+      enum: ["monthly", "yearly", "lifetime"],
+      default: null,
+    },
+    premiumStartDate: { type: Date, default: null },
+    premiumEndDate: { type: Date, default: null },
   },
   {
     timestamps: TIME_STAMPS,

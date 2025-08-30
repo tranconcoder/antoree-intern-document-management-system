@@ -8,35 +8,76 @@ import KeyTokenService from "@/services/keyToken.service";
 export const validateToken: RequestHandler = catchAsyncExpress(
   async (req, res, next) => {
     try {
+      console.log("🔐 Auth middleware started");
+      console.log("📝 Request headers:", req.headers);
+
       const token = req.headers["authorization"];
-      if (!token) throw errorResponses.AUTH_TOKEN_NOT_FOUND;
+      if (!token) {
+        console.log("❌ No authorization header found");
+        throw new ErrorResponse({
+          errorResponseItem: errorResponses.AUTH_TOKEN_NOT_FOUND,
+        });
+      }
 
       const accessToken = token.split(" ")[1];
-      if (!accessToken) throw errorResponses.AUTH_TOKEN_NOT_FOUND;
+      if (!accessToken) {
+        console.log("❌ No Bearer token found");
+        throw new ErrorResponse({
+          errorResponseItem: errorResponses.AUTH_TOKEN_NOT_FOUND,
+        });
+      }
+
+      console.log("🎫 Access Token:", accessToken.substring(0, 50) + "...");
 
       const decoded = JwtService.decode(accessToken);
-      console.log({ decoded });
-      if (!decoded) throw errorResponses.AUTH_TOKEN_NOT_FOUND;
+      console.log("🔓 Decoded token:", decoded);
+      if (!decoded) {
+        console.log("❌ Failed to decode token");
+        throw new ErrorResponse({
+          errorResponseItem: errorResponses.AUTH_INVALID_CREDENTIALS,
+        });
+      }
 
       const { userId, jti } = decoded;
+      if (!userId || !jti) {
+        console.log("❌ Missing userId or jti in token", { userId, jti });
+        throw new ErrorResponse({
+          errorResponseItem: errorResponses.AUTH_INVALID_CREDENTIALS,
+        });
+      }
+
+      console.log("🔍 Looking for key token:", { userId, jti });
       const keyToken = await KeyTokenService.findKeyToken(userId, jti);
-      if (!keyToken) throw errorResponses.AUTH_KEY_TOKEN_NOT_FOUND;
+      if (!keyToken) {
+        console.log("❌ Key token not found");
+        throw new ErrorResponse({
+          errorResponseItem: errorResponses.AUTH_KEY_TOKEN_NOT_FOUND,
+        });
+      }
 
+      console.log("🔑 Key token found, verifying...");
       const verifySuccess = JwtService.verify(accessToken, keyToken.publicKey);
-      if (!verifySuccess) throw errorResponses.AUTH_INVALID_CREDENTIALS;
+      if (!verifySuccess) {
+        console.log("❌ Token verification failed");
+        throw new ErrorResponse({
+          errorResponseItem: errorResponses.AUTH_INVALID_CREDENTIALS,
+        });
+      }
 
+      console.log("✅ Token verified successfully");
       //   Add payload to request
       req.userId = userId;
       req.jti = jti;
 
       next();
     } catch (e: any) {
+      console.log("💥 Auth middleware error:", e);
       if (e instanceof ErrorResponse) {
         throw e;
       }
 
       throw new ErrorResponse({
-        errorResponseItem: e,
+        errorResponseItem: errorResponses.AUTH_INVALID_CREDENTIALS,
       });
     }
   }

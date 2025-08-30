@@ -126,9 +126,19 @@ export default class AuthService {
       privateKey
     );
 
-    // Update key token with new jti
-    await KeyTokenService.createKeyToken(decoded.userId, publicKey, jti);
+    // Update key token with new jti and invalidate old one
+    await KeyTokenService.updateKeyToken(
+      decoded.userId,
+      decoded.jti, // old jti to verify
+      publicKey,
+      jti // new jti
+    );
 
     return { accessToken, refreshToken };
+  }
+
+  public static async logout(userId: string, jti?: string): Promise<void> {
+    // Xóa key token để vô hiệu hóa tất cả tokens
+    await KeyTokenService.deleteKeyToken(userId, jti);
   }
 }

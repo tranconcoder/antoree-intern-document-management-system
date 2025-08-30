@@ -1,10 +1,6 @@
-import { userModel } from "@/models/user.model";
 import axios, { AxiosError, AxiosHeaders, AxiosRequestConfig } from "axios";
 import { AXIOS_URL } from "@/configs/axios.config";
 import { RefreshTokenResponse } from "@/types/response";
-import { store } from "@/store";
-import { logoutUser } from "@/store/thunks/user.thunk";
-import { updateTokens } from "@/store/slices/user.slice";
 
 const axiosInstance = axios.create({
   baseURL: AXIOS_URL,
@@ -50,9 +46,13 @@ let isRefreshing = false;
 let refreshPromise: Promise<RefreshTokenResponse> | null = null;
 
 // Helper function to perform complete logout using Redux
-const performLogout = (reason: string) => {
+const performLogout = async (reason: string) => {
   if (typeof window !== "undefined") {
     console.log(`${reason}, logging out...`);
+
+    // Dynamic import to avoid circular dependency
+    const { store } = await import("@/store");
+    const { logoutUser } = await import("@/store/thunks/user.thunk");
 
     // Dispatch logout action to Redux store
     store.dispatch(logoutUser());
@@ -75,7 +75,16 @@ axiosInstance.interceptors.request.use(
           const persistData = JSON.parse(
             localStorage.getItem("persist:root") || "{}"
           );
+          console.log("🔍 Persist data keys:", Object.keys(persistData));
+
           const userData = JSON.parse(persistData.user || "{}");
+          console.log("👤 User data structure:", {
+            hasTokens: !!userData.tokens,
+            hasAccessToken: !!userData.tokens?.accessToken,
+            hasRefreshToken: !!userData.tokens?.refreshToken,
+            tokenLength: userData.tokens?.accessToken?.length,
+          });
+
           accessToken = userData.tokens?.accessToken || null;
         } catch (parseError) {
           console.error("Error parsing tokens from persist store:", parseError);
@@ -83,12 +92,18 @@ axiosInstance.interceptors.request.use(
         }
       }
 
-      console.log({ accessToken });
+      console.log(
+        "🎫 Using access token:",
+        accessToken ? accessToken.substring(0, 50) + "..." : "null"
+      );
 
       if (accessToken) {
         const headers = toAxiosHeaders(config.headers);
         headers.set("Authorization", `Bearer ${accessToken}`);
         config.headers = headers;
+        console.log("✅ Authorization header set");
+      } else {
+        console.log("❌ No access token available");
       }
     } catch (e: any) {
       console.error("Error in request interceptor:", e);
@@ -133,12 +148,13 @@ axiosInstance.interceptors.response.use(
 
       if (!refreshToken) {
         // No refresh token -> perform logout
-        performLogout("No refresh token found");
+        await performLogout("No refresh token found");
         return Promise.reject(error);
       }
 
       if (originalRequest._retry) {
         // Already retried once, avoid loops
+        await performLogout("Multiple refresh attempts failed");
         return Promise.reject(error);
       }
       originalRequest._retry = true;
@@ -147,12 +163,32 @@ axiosInstance.interceptors.response.use(
         if (!isRefreshing) {
           isRefreshing = true;
           refreshPromise = refreshClient
-            .post<RefreshTokenResponse>("/auth/refresh-token", {
+            .post<{ metadata: RefreshTokenResponse }>("/auth/refresh-token", {
               refreshToken,
             })
-            .then((res) => res.data)
-            .then((tokens) => {
+            .then((res) => {
+              // Validate response structure
+              if (
+                !res.data?.metadata?.accessToken ||
+                !res.data?.metadata?.refreshToken
+              ) {
+                throw new Error("Invalid refresh token response format");
+              }
+              return res.data.metadata;
+            })
+            .then(async (tokens) => {
+              console.log("🔄 Token refreshed successfully:", {
+                newAccessToken: tokens.accessToken.substring(0, 50) + "...",
+                newRefreshToken: tokens.refreshToken.substring(0, 50) + "...",
+              });
+
               if (typeof window !== "undefined") {
+                // Dynamic import to avoid circular dependency
+                const { store } = await import("@/store");
+                const { updateTokens } = await import(
+                  "@/store/slices/user.slice"
+                );
+
                 // Update tokens using Redux action
                 store.dispatch(
                   updateTokens({
@@ -163,13 +199,15 @@ axiosInstance.interceptors.response.use(
               }
               return tokens;
             })
-            .catch((refreshErr) => {
+            .catch(async (refreshErr) => {
+              console.error("Refresh token error:", refreshErr);
               // On refresh failure, perform logout
-              performLogout("Refresh token failed");
+              await performLogout("Refresh token failed");
               throw refreshErr;
             })
             .finally(() => {
               isRefreshing = false;
+              refreshPromise = null;
             });
         }
 

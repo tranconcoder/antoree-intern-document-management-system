@@ -13,6 +13,10 @@ import {
   IoFlash,
   IoGift,
 } from "react-icons/io5";
+import premiumService from "@/services/premium.service";
+import PremiumSuccessModal from "@/components/ui/PremiumSuccessModal";
+
+console.log("Premium service imported:", premiumService);
 
 interface PremiumSectionProps {
   user?: any;
@@ -24,6 +28,9 @@ export default function PremiumSection({
   onUpgrade,
 }: PremiumSectionProps) {
   const [isDismissed, setIsDismissed] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [purchasedPlanName, setPurchasedPlanName] = useState("");
 
   // Don't show if user is already premium or dismissed
   if (user?.isPremium || isDismissed) {
@@ -35,11 +42,47 @@ export default function PremiumSection({
     localStorage.setItem("premiumSectionDismissed", "true");
   };
 
-  const handleUpgrade = (planId: string) => {
-    if (onUpgrade) {
-      onUpgrade(planId);
-    } else {
-      window.open(`/premium/subscribe?plan=${planId}`, "_blank");
+  const handleUpgrade = async (planId: string) => {
+    console.log('🎯 Button clicked with planId:', planId);
+    console.log('🔄 isLoading:', isLoading);
+    console.log('👤 user:', user);
+    console.log('🛠️ premiumService available:', !!premiumService);
+    console.log('🔧 premiumService methods:', Object.keys(premiumService || {}));
+    
+    if (isLoading) return;
+
+    setIsLoading(true);
+    try {
+      if (!premiumService) {
+        throw new Error('Premium service not available');
+      }
+      
+      console.log('🛒 Calling API to purchase plan');
+      // Always call API to purchase plan
+      const result = await premiumService.purchasePlan(planId);
+      
+      console.log('📦 Purchase result:', result);
+
+      if (result.success) {
+        // Find the plan name
+        const plan = plans.find((p) => p.id === planId);
+        setPurchasedPlanName(plan?.name || "Premium");
+        setShowSuccessModal(true);
+        
+        // Also call onUpgrade if provided (for additional logic)
+        if (onUpgrade) {
+          console.log('📞 Also calling onUpgrade prop for additional logic');
+          onUpgrade(planId);
+        }
+      } else {
+        // Show error message
+        alert(result.message || "Có lỗi xảy ra khi mua gói premium");
+      }
+    } catch (error) {
+      console.error("Error purchasing premium:", error);
+      alert("Có lỗi xảy ra khi mua gói premium");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -250,17 +293,34 @@ export default function PremiumSection({
               <div className="mt-auto">
                 <button
                   onClick={() => handleUpgrade(plan.id)}
-                  className={`w-full py-4 px-6 bg-gradient-to-r ${plan.gradient} text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 group`}
+                  disabled={isLoading}
+                  className={`w-full py-4 px-6 bg-gradient-to-r ${plan.gradient} text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none`}
                 >
-                  <IoRocket className="w-5 h-5 group-hover:animate-bounce" />
-                  <span>Chọn {plan.name}</span>
-                  <IoSparkles className="w-5 h-5 group-hover:animate-spin" />
+                  {isLoading ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                      <span>Đang xử lý...</span>
+                    </>
+                  ) : (
+                    <>
+                      <IoRocket className="w-5 h-5 group-hover:animate-bounce" />
+                      <span>Chọn {plan.name}</span>
+                      <IoSparkles className="w-5 h-5 group-hover:animate-spin" />
+                    </>
+                  )}
                 </button>
               </div>
             </div>
           </div>
         ))}
       </div>
+
+      {/* Success Modal */}
+      <PremiumSuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        planName={purchasedPlanName}
+      />
     </div>
   );
 }
