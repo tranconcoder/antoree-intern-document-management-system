@@ -46,15 +46,17 @@ export default function PremiumSection({
   const plans = [
     {
       id: "basic",
-      name: "Starter",
-      price: "299K",
-      period: "/năm",
-      originalPrice: "599K",
+      name: "Gói Cơ Bản",
+      price: "299,000",
+      period: " VNĐ/năm",
+      originalPrice: "599,000 VNĐ",
       features: [
-        "10GB Cloud Storage",
-        "Basic Upload Tools",
-        "Email Support",
-        "Mobile App Access",
+        "Lưu trữ đám mây 10GB",
+        "Công cụ tải lên cơ bản",
+        "Hỗ trợ qua email",
+        "Truy cập ứng dụng di động",
+        "Quản lý tài liệu cá nhân",
+        "Bảo mật tiêu chuẩn",
       ],
       icon: <IoRocket className="w-6 h-6 text-white" />,
       gradient: "from-blue-500 to-cyan-500",
@@ -62,17 +64,19 @@ export default function PremiumSection({
     },
     {
       id: "pro",
-      name: "Professional",
-      price: "599K",
-      period: "/năm",
-      originalPrice: "1.199K",
+      name: "Gói Chuyên Nghiệp",
+      price: "599,000",
+      period: " VNĐ/năm",
+      originalPrice: "1,199,000 VNĐ",
       features: [
-        "100GB Cloud Storage",
-        "AI Smart Search",
-        "24/7 Priority Support",
-        "Team Collaboration",
-        "Advanced Analytics",
-        "API Access",
+        "Lưu trữ đám mây 100GB",
+        "Tìm kiếm thông minh AI",
+        "Hỗ trợ ưu tiên 24/7",
+        "Cộng tác nhóm",
+        "Phân tích nâng cao",
+        "Truy cập API",
+        "Chữ ký số",
+        "Sao lưu tự động",
       ],
       icon: <IoTrophy className="w-6 h-6 text-white" />,
       gradient: "from-purple-600 to-pink-600",
@@ -81,18 +85,20 @@ export default function PremiumSection({
     },
     {
       id: "enterprise",
-      name: "Enterprise",
-      price: "1.199K",
-      period: "/năm",
-      originalPrice: "2.399K",
+      name: "Gói Doanh Nghiệp",
+      price: "1,199,000",
+      period: " VNĐ/năm",
+      originalPrice: "2,399,000 VNĐ",
       features: [
-        "Unlimited Storage",
-        "All Pro Features",
-        "VIP Support",
-        "Custom Integrations",
-        "White-label Solution",
-        "SLA 99.9%",
-        "Dedicated Manager",
+        "Lưu trữ không giới hạn",
+        "Tất cả tính năng Pro",
+        "Hỗ trợ VIP độc quyền",
+        "Tích hợp tùy chỉnh",
+        "Giải pháp thương hiệu riêng",
+        "Cam kết SLA 99.9%",
+        "Quản lý tài khoản riêng",
+        "Đào tạo chuyên sâu",
+        "Bảo mật cấp doanh nghiệp",
       ],
       icon: <IoDiamond className="w-6 h-6 text-white" />,
       gradient: "from-yellow-500 to-orange-500",
@@ -122,7 +128,7 @@ export default function PremiumSection({
 
           <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white bg-opacity-95 rounded-full text-orange-600 text-sm font-semibold mb-6 shadow-lg">
             <IoFlash className="w-4 h-4" />
-            <span>Ưu đãi độc quyền - Chỉ trong 24h!</span>
+            <span>Ưu đãi đặc biệt - Chỉ còn 24 giờ!</span>
             <IoGift className="w-4 h-4" />
           </div>
 
@@ -134,23 +140,23 @@ export default function PremiumSection({
           </h2>
 
           <p className="text-purple-200 text-lg mb-8 max-w-2xl mx-auto">
-            Mở khóa toàn bộ sức mạnh của nền tảng quản lý tài liệu thông minh
-            với AI
+            Trải nghiệm đầy đủ sức mạnh của hệ thống quản lý tài liệu thông minh
+            với công nghệ AI tiên tiến
           </p>
 
           {/* Trust Indicators */}
           <div className="flex items-center justify-center space-x-8 text-sm">
             <div className="flex items-center space-x-2 text-purple-200">
               <IoStar className="w-4 h-4 text-yellow-400" />
-              <span>4.9/5 từ 25K+ người dùng</span>
+              <span>4.9/5 từ hơn 25,000 người dùng</span>
             </div>
             <div className="flex items-center space-x-2 text-purple-200">
               <IoShield className="w-4 h-4 text-green-400" />
-              <span>Hoàn tiền 100% trong 30 ngày</span>
+              <span>Đảm bảo hoàn tiền 100% trong 30 ngày</span>
             </div>
             <div className="flex items-center space-x-2 text-purple-200">
               <IoFlash className="w-4 h-4 text-blue-400" />
-              <span>Kích hoạt tức thì</span>
+              <span>Kích hoạt ngay lập tức</span>
             </div>
           </div>
         </div>
