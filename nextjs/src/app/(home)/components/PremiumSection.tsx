@@ -243,41 +243,6 @@ export default function PremiumSection({
           </div>
         ))}
       </div>
-
-      {/* Bottom CTA Section */}
-      <div className="mt-12 text-center bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-8">
-        <div className="flex items-center justify-center space-x-2 mb-4">
-          <IoHeart className="w-6 h-6 text-red-500" />
-          <span className="text-xl font-bold text-gray-900">
-            Được tin tưởng bởi 25,000+ doanh nghiệp
-          </span>
-          <IoHeart className="w-6 h-6 text-red-500" />
-        </div>
-
-        <div className="grid grid-cols-4 gap-8 max-w-2xl mx-auto mb-6">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">99.9%</div>
-            <div className="text-sm text-gray-600">Uptime</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">24/7</div>
-            <div className="text-sm text-gray-600">Support</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">50M+</div>
-            <div className="text-sm text-gray-600">Files Processed</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-orange-600">30 Days</div>
-            <div className="text-sm text-gray-600">Money Back</div>
-          </div>
-        </div>
-
-        <p className="text-gray-600 text-sm">
-          Không cần thẻ tín dụng • Kích hoạt ngay lập tức • Hủy bất kỳ lúc nào •
-          Bảo mật SSL 256-bit
-        </p>
-      </div>
     </div>
   );
 }
