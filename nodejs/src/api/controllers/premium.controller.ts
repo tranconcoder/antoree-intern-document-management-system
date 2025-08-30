@@ -1,8 +1,6 @@
 import type { Request, Response } from "express";
 import { Types } from "mongoose";
-import PremiumSubscription, {
-  type IPremiumSubscription,
-} from "../models/premiumSubscription.model";
+import PremiumSubscription from "../models/premiumSubscription.model";
 import User from "../models/user.model";
 
 export class PremiumController {
