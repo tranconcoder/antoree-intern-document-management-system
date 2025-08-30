@@ -45,38 +45,44 @@ export default function PremiumSection({
 
   const plans = [
     {
-      id: "basic",
-      name: "Gói Cơ Bản",
-      price: "299,000",
-      period: " VNĐ/năm",
-      originalPrice: "599,000 VNĐ",
+      id: "monthly",
+      name: "Premium 1 Tháng",
+      price: "99,000",
+      period: " VNĐ/tháng",
+      originalPrice: "149,000 VNĐ",
       features: [
-        "Lưu trữ đám mây 10GB",
-        "Công cụ tải lên cơ bản",
-        "Hỗ trợ qua email",
-        "Truy cập ứng dụng di động",
-        "Quản lý tài liệu cá nhân",
-        "Bảo mật tiêu chuẩn",
+        "Lưu trữ đám mây không giới hạn",
+        "Tìm kiếm thông minh AI",
+        "Hỗ trợ ưu tiên 24/7",
+        "Cộng tác nhóm không giới hạn",
+        "Phân tích nâng cao",
+        "Truy cập API đầy đủ",
+        "Chữ ký số",
+        "Sao lưu tự động",
+        "Bảo mật cấp doanh nghiệp",
+        "Tích hợp tùy chỉnh",
       ],
       icon: <IoRocket className="w-6 h-6 text-white" />,
       gradient: "from-blue-500 to-cyan-500",
-      badge: "Tiết kiệm 50%",
+      badge: "Linh hoạt",
     },
     {
-      id: "pro",
-      name: "Gói Chuyên Nghiệp",
-      price: "599,000",
+      id: "yearly",
+      name: "Premium 1 Năm",
+      price: "799,000",
       period: " VNĐ/năm",
-      originalPrice: "1,199,000 VNĐ",
+      originalPrice: "1,188,000 VNĐ",
       features: [
-        "Lưu trữ đám mây 100GB",
+        "Lưu trữ đám mây không giới hạn",
         "Tìm kiếm thông minh AI",
         "Hỗ trợ ưu tiên 24/7",
-        "Cộng tác nhóm",
+        "Cộng tác nhóm không giới hạn",
         "Phân tích nâng cao",
-        "Truy cập API",
+        "Truy cập API đầy đủ",
         "Chữ ký số",
         "Sao lưu tự động",
+        "Bảo mật cấp doanh nghiệp",
+        "Tích hợp tùy chỉnh",
       ],
       icon: <IoTrophy className="w-6 h-6 text-white" />,
       gradient: "from-purple-600 to-pink-600",
@@ -84,21 +90,23 @@ export default function PremiumSection({
       popular: true,
     },
     {
-      id: "enterprise",
-      name: "Gói Doanh Nghiệp",
-      price: "1,199,000",
-      period: " VNĐ/năm",
-      originalPrice: "2,399,000 VNĐ",
+      id: "lifetime",
+      name: "Premium Trọn Đời",
+      price: "2,999,000",
+      period: " VNĐ (một lần)",
+      originalPrice: "9,999,000 VNĐ",
       features: [
-        "Lưu trữ không giới hạn",
-        "Tất cả tính năng Pro",
-        "Hỗ trợ VIP độc quyền",
-        "Tích hợp tùy chỉnh",
-        "Giải pháp thương hiệu riêng",
-        "Cam kết SLA 99.9%",
-        "Quản lý tài khoản riêng",
-        "Đào tạo chuyên sâu",
+        "Lưu trữ đám mây không giới hạn",
+        "Tìm kiếm thông minh AI",
+        "Hỗ trợ ưu tiên 24/7",
+        "Cộng tác nhóm không giới hạn",
+        "Phân tích nâng cao",
+        "Truy cập API đầy đủ",
+        "Chữ ký số",
+        "Sao lưu tự động",
         "Bảo mật cấp doanh nghiệp",
+        "Tích hợp tùy chỉnh",
+        "Cập nhật miễn phí trọn đời",
       ],
       icon: <IoDiamond className="w-6 h-6 text-white" />,
       gradient: "from-yellow-500 to-orange-500",
@@ -212,7 +220,11 @@ export default function PremiumSection({
                   <span className="text-lg text-gray-600">{plan.period}</span>
                 </div>
                 <div className="text-sm text-green-600 font-semibold">
-                  Tiết kiệm 50%
+                  {plan.id === "monthly"
+                    ? "Tiết kiệm 34%"
+                    : plan.id === "yearly"
+                    ? "Tiết kiệm 33%"
+                    : "Tiết kiệm 70%"}
                 </div>
               </div>
 
