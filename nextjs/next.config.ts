@@ -4,9 +4,7 @@ import path from "path";
 
 const nextConfig: NextConfig = {
   /* config options here */
-  experimental: {
-    serverComponentsExternalPackages: ["fs"],
-  },
+  serverExternalPackages: ["fs"],
 
   // HTTPS configuration for development
   async rewrites() {

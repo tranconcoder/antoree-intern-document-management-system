@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useParams, useRouter } from "next/navigation";
 import {
   IoArrowBack,
@@ -17,7 +17,7 @@ import FileViewer from "@/components/documents/FileViewer";
 import type { Document } from "@/types/document";
 import { HttpStatusCode } from "axios";
 
-export default function DocumentDetailPage() {
+function DocumentDetailPageContent() {
   const params = useParams();
   const router = useRouter();
   const documentId = params.id as string;
@@ -461,5 +461,13 @@ export default function DocumentDetailPage() {
         <FileViewer file={viewingFile} onClose={handleCloseViewer} />
       )}
     </div>
+  );
+}
+
+export default function DocumentDetailPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DocumentDetailPageContent />
+    </Suspense>
   );
 }

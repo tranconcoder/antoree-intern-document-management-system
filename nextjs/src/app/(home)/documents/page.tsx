@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import {
   IoSearch,
@@ -12,7 +12,7 @@ import DocumentService from "@/services/document.service";
 import DocumentList from "@/components/documents/DocumentList";
 import type { Document } from "@/types/document";
 
-export default function DocumentsPage() {
+function DocumentsPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const uploaded = searchParams.get("uploaded");
@@ -249,5 +249,13 @@ export default function DocumentsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DocumentsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DocumentsPageContent />
+    </Suspense>
   );
 }
