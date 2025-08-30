@@ -48,7 +48,8 @@ let refreshPromise: Promise<RefreshTokenResponse> | null = null;
 // Helper function to perform complete logout using Redux
 const performLogout = async (reason: string) => {
   if (typeof window !== "undefined") {
-    console.log(`${reason}, logging out...`);
+    console.log(`🚨 LOGOUT TRIGGERED: ${reason}`);
+    console.trace("📍 Logout triggered from:");
 
     // Dynamic import to avoid circular dependency
     const { store } = await import("@/store");
@@ -59,6 +60,7 @@ const performLogout = async (reason: string) => {
 
     // Small delay to ensure state is updated before redirect
     setTimeout(() => {
+      console.log("🔄 Redirecting to login page...");
       window.location.href = "/auth/login";
     }, 100);
   }
@@ -189,6 +191,8 @@ axiosInstance.interceptors.response.use(
                   "@/store/slices/user.slice"
                 );
 
+                console.log("🔄 Updating Redux store with new tokens...");
+
                 // Update tokens using Redux action
                 store.dispatch(
                   updateTokens({
@@ -196,6 +200,25 @@ axiosInstance.interceptors.response.use(
                     refreshToken: tokens.refreshToken,
                   })
                 );
+
+                // Force persist immediately
+                const { persistor } = await import("@/store");
+                await persistor.flush();
+
+                console.log("✅ Tokens updated in Redux and persisted");
+
+                // Verify tokens are actually stored
+                setTimeout(() => {
+                  const persistData = JSON.parse(
+                    localStorage.getItem("persist:root") || "{}"
+                  );
+                  const userData = JSON.parse(persistData.user || "{}");
+                  console.log("🔍 Verification - tokens after update:", {
+                    hasAccessToken: !!userData.tokens?.accessToken,
+                    accessTokenMatch:
+                      userData.tokens?.accessToken === tokens.accessToken,
+                  });
+                }, 100);
               }
               return tokens;
             })
@@ -214,9 +237,17 @@ axiosInstance.interceptors.response.use(
         // Wait for refresh to resolve and then retry the original request
         const tokens = await (refreshPromise as Promise<RefreshTokenResponse>);
 
+        console.log("🔄 Retrying original request with new token...");
+
+        // Add a small delay to ensure tokens are persisted
+        await new Promise((resolve) => setTimeout(resolve, 200));
+
         const headers = toAxiosHeaders(originalRequest.headers);
         headers.set("Authorization", `Bearer ${tokens.accessToken}`);
         originalRequest.headers = headers;
+
+        console.log("🔄 Original request headers updated with new token");
+
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         return Promise.reject(refreshError);

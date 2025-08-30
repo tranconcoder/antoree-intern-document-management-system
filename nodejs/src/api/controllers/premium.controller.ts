@@ -310,13 +310,55 @@ export class PremiumController {
       );
 
       // Recent subscriptions
-      const recentSubscriptions = await PremiumSubscription.find({
-        purchaseDate: { $gte: start, $lte: end },
-      })
-        .populate("userId", "name email")
-        .sort({ purchaseDate: -1 })
-        .limit(10)
-        .lean();
+      const recentSubscriptions = await PremiumSubscription.aggregate([
+        {
+          $match: {
+            purchaseDate: { $gte: start, $lte: end },
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "userId",
+            foreignField: "_id",
+            as: "user",
+            pipeline: [
+              {
+                $project: {
+                  name: "$user_firstName",
+                  email: "$user_email",
+                },
+              },
+            ],
+          },
+        },
+        {
+          $unwind: {
+            path: "$user",
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $sort: { purchaseDate: -1 },
+        },
+        {
+          $limit: 10,
+        },
+        {
+          $project: {
+            _id: 1,
+            planName: 1,
+            planType: 1,
+            amount: 1,
+            purchaseDate: 1,
+            userId: {
+              _id: "$user._id",
+              name: "$user.name",
+              email: "$user.email",
+            },
+          },
+        },
+      ]);
 
       res.status(200).json({
         success: true,

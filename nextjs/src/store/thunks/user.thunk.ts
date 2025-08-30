@@ -40,6 +40,9 @@ export const fetchRegister = createAsyncThunk(
 export const logoutUser = createAsyncThunk(
   "user/logout",
   async (_, { dispatch }) => {
+    console.log("🚪 LogoutUser thunk called!");
+    console.trace("📍 Logout called from:");
+
     // Import persistor dynamically to avoid circular dependency
     const { persistor } = await import("../store");
 
@@ -52,6 +55,7 @@ export const logoutUser = createAsyncThunk(
       localStorage.removeItem("persist:root");
     }
 
+    console.log("✅ Logout completed");
     return;
   }
 );
