@@ -12,8 +12,6 @@ import {
   IoDiamond,
   IoFlash,
   IoGift,
-  IoHeart,
-  IoTrendingUp,
 } from "react-icons/io5";
 
 interface PremiumSectionProps {
@@ -159,11 +157,11 @@ export default function PremiumSection({
       </div>
 
       {/* Pricing Cards with Modern Design */}
-      <div className="grid lg:grid-cols-3 gap-6 mt-8">
+      <div className="grid lg:grid-cols-3 gap-6 mt-16">
         {plans.map((plan) => (
           <div
             key={plan.id}
-            className={`relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 ${
+            className={`relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 flex flex-col ${
               plan.popular
                 ? "ring-4 ring-purple-500 ring-opacity-50 scale-105"
                 : ""
@@ -178,7 +176,7 @@ export default function PremiumSection({
               </div>
             )}
 
-            <div className="p-8">
+            <div className="p-8 flex flex-col h-full">
               {/* Plan Header */}
               <div className="text-center mb-8">
                 <div
@@ -213,7 +211,7 @@ export default function PremiumSection({
               </div>
 
               {/* Features */}
-              <div className="mb-8">
+              <div className="mb-8 flex-grow">
                 <ul className="space-y-3">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-start space-x-3">
@@ -230,15 +228,17 @@ export default function PremiumSection({
                 </ul>
               </div>
 
-              {/* CTA Button */}
-              <button
-                onClick={() => handleUpgrade(plan.id)}
-                className={`w-full py-4 px-6 bg-gradient-to-r ${plan.gradient} text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 group`}
-              >
-                <IoRocket className="w-5 h-5 group-hover:animate-bounce" />
-                <span>Chọn {plan.name}</span>
-                <IoSparkles className="w-5 h-5 group-hover:animate-spin" />
-              </button>
+              {/* CTA Button - Always at bottom */}
+              <div className="mt-auto">
+                <button
+                  onClick={() => handleUpgrade(plan.id)}
+                  className={`w-full py-4 px-6 bg-gradient-to-r ${plan.gradient} text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 group`}
+                >
+                  <IoRocket className="w-5 h-5 group-hover:animate-bounce" />
+                  <span>Chọn {plan.name}</span>
+                  <IoSparkles className="w-5 h-5 group-hover:animate-spin" />
+                </button>
+              </div>
             </div>
           </div>
         ))}
