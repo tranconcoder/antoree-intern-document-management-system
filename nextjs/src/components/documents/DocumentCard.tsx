@@ -39,15 +39,32 @@ export default function DocumentCard({
   const [isExpanded, setIsExpanded] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  // Format date
+  // Format date with error handling
   const formatDate = (dateString: string): string => {
-    return new Date(dateString).toLocaleDateString("vi-VN", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    try {
+      if (!dateString) {
+        return "N/A";
+      }
+
+      const date = new Date(dateString);
+
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.warn("Invalid date string:", dateString);
+        return "Invalid date";
+      }
+
+      return date.toLocaleDateString("vi-VN", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (error) {
+      console.error("Error formatting date:", error, "dateString:", dateString);
+      return "Error formatting date";
+    }
   };
 
   // Calculate total size of all files

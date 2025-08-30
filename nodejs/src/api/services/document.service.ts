@@ -98,12 +98,34 @@ export default new (class DocumentService {
     }
   }
 
+  // Helper method to transform MongoDB document to frontend format
+  private transformDocumentForFrontend(doc: any) {
+    const transformed = doc.toObject();
+
+    // Transform timestamp field names
+    if (transformed.created_at) {
+      transformed.createdAt = transformed.created_at;
+      delete transformed.created_at;
+    }
+    if (transformed.updated_at) {
+      transformed.updatedAt = transformed.updated_at;
+      delete transformed.updated_at;
+    }
+
+    return transformed;
+  }
+
   async getSelfDocuments(userId: string) {
-    return documentModel.find({ userId }, { "files.data": 0 });
+    const documents = await documentModel.find({ userId }, { "files.data": 0 });
+    return documents.map((doc) => this.transformDocumentForFrontend(doc));
   }
 
   async getPublicDocuments() {
-    return documentModel.find({ isPublic: true }, { "files.data": 0 });
+    const documents = await documentModel.find(
+      { isPublic: true },
+      { "files.data": 0 }
+    );
+    return documents.map((doc) => this.transformDocumentForFrontend(doc));
   }
 
   async getDocumentById(documentId: string) {
@@ -120,7 +142,7 @@ export default new (class DocumentService {
       throw new Error("Document not found");
     }
 
-    return document;
+    return this.transformDocumentForFrontend(document);
   }
 
   async getDocumentFileData(documentId: string) {

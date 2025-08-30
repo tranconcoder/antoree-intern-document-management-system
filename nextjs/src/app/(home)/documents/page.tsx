@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import {
   IoSearch,
   IoFilter,
@@ -14,6 +14,7 @@ import type { Document } from "@/types/document";
 
 export default function DocumentsPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const uploaded = searchParams.get("uploaded");
 
   // State management
@@ -118,8 +119,8 @@ export default function DocumentsPage() {
   ) => {};
 
   const handleViewDocument = (documentId: string) => {
-    // Open document details in a new tab or modal
-    window.open(`/documents/${documentId}`, "_blank");
+    // Navigate to document details page in the same tab
+    router.push(`/documents/${documentId}`);
   };
 
   const handleRefresh = () => {

@@ -199,13 +199,30 @@ export default function DocumentDetailPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("vi-VN", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    try {
+      if (!dateString) {
+        return "N/A";
+      }
+
+      const date = new Date(dateString);
+
+      // Check if date is valid
+      if (isNaN(date.getTime())) {
+        console.warn("Invalid date string:", dateString);
+        return "Invalid date";
+      }
+
+      return date.toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch (error) {
+      console.error("Error formatting date:", error, "dateString:", dateString);
+      return "Error formatting date";
+    }
   };
 
   if (loading) {
