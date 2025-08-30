@@ -2,14 +2,19 @@
 
 import React, { useState } from "react";
 import {
-  IoStar,
   IoClose,
-  IoGift,
-  IoTrendingUp,
+  IoStar,
+  IoSparkles,
+  IoRocket,
   IoShield,
-  IoTime,
+  IoCheckmark,
+  IoTrophy,
+  IoDiamond,
+  IoFlash,
+  IoGift,
+  IoHeart,
+  IoTrendingUp,
 } from "react-icons/io5";
-import PremiumCard from "./PremiumCard";
 
 interface PremiumSectionProps {
   user?: any;
@@ -20,17 +25,15 @@ export default function PremiumSection({
   user,
   onUpgrade,
 }: PremiumSectionProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
-  // Don't show if user is already premium
+  // Don't show if user is already premium or dismissed
   if (user?.isPremium || isDismissed) {
     return null;
   }
 
   const handleDismiss = () => {
     setIsDismissed(true);
-    // You might want to save this preference in localStorage
     localStorage.setItem("premiumSectionDismissed", "true");
   };
 
@@ -38,145 +41,242 @@ export default function PremiumSection({
     if (onUpgrade) {
       onUpgrade(planId);
     } else {
-      // Default upgrade action
-      window.open(`/premium/upgrade?plan=${planId}`, "_blank");
+      window.open(`/premium/subscribe?plan=${planId}`, "_blank");
     }
   };
 
-  if (!isExpanded) {
-    return (
-      <div className="bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white py-4 px-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 mb-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center">
-              <IoStar className="w-6 h-6" />
-            </div>
-            <div>
-              <h3 className="font-bold text-lg">🎉 Ưu đãi đặc biệt Premium!</h3>
-              <p className="text-yellow-100">
-                Giảm 50% cho 1000 người đăng ký đầu tiên
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => setIsExpanded(true)}
-              className="px-6 py-2 bg-white text-orange-500 rounded-xl font-semibold hover:bg-gray-100 transition-colors"
-            >
-              Xem chi tiết
-            </button>
-            <button
-              onClick={handleDismiss}
-              className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
-            >
-              <IoClose className="w-5 h-5" />
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const plans = [
+    {
+      id: "basic",
+      name: "Starter",
+      price: "299K",
+      period: "/năm",
+      originalPrice: "599K",
+      features: [
+        "10GB Cloud Storage",
+        "Basic Upload Tools",
+        "Email Support",
+        "Mobile App Access",
+      ],
+      icon: <IoRocket className="w-6 h-6 text-white" />,
+      gradient: "from-blue-500 to-cyan-500",
+      badge: "Tiết kiệm 50%",
+    },
+    {
+      id: "pro",
+      name: "Professional",
+      price: "599K",
+      period: "/năm",
+      originalPrice: "1.199K",
+      features: [
+        "100GB Cloud Storage",
+        "AI Smart Search",
+        "24/7 Priority Support",
+        "Team Collaboration",
+        "Advanced Analytics",
+        "API Access",
+      ],
+      icon: <IoTrophy className="w-6 h-6 text-white" />,
+      gradient: "from-purple-600 to-pink-600",
+      badge: "Phổ biến nhất",
+      popular: true,
+    },
+    {
+      id: "enterprise",
+      name: "Enterprise",
+      price: "1.199K",
+      period: "/năm",
+      originalPrice: "2.399K",
+      features: [
+        "Unlimited Storage",
+        "All Pro Features",
+        "VIP Support",
+        "Custom Integrations",
+        "White-label Solution",
+        "SLA 99.9%",
+        "Dedicated Manager",
+      ],
+      icon: <IoDiamond className="w-6 h-6 text-white" />,
+      gradient: "from-yellow-500 to-orange-500",
+      badge: "Giá trị tốt nhất",
+    },
+  ];
 
   return (
-    <div className="mb-8">
-      {/* Banner */}
-      <div className="bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 text-white py-6 px-8 rounded-t-2xl">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className="w-16 h-16 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center">
-              <IoGift className="w-8 h-8" />
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold mb-1">
-                🔥 Ưu đãi Premium giới hạn!
-              </h2>
-              <p className="text-yellow-100 text-lg">
-                Chỉ còn 72 giờ - Giảm 50% gói Premium
-              </p>
-            </div>
-          </div>
+    <div className="mb-12 relative">
+      {/* Premium Header with Modern Design */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900 rounded-3xl shadow-2xl">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-10 left-10 w-32 h-32 bg-purple-400 rounded-full opacity-20 blur-2xl animate-pulse"></div>
+          <div className="absolute bottom-10 right-10 w-40 h-40 bg-pink-400 rounded-full opacity-15 blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 w-24 h-24 bg-blue-400 rounded-full opacity-25 blur-xl animate-bounce"></div>
+        </div>
 
+        {/* Header Content */}
+        <div className="relative z-10 p-8 text-center">
           <button
-            onClick={() => setIsExpanded(false)}
-            className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors"
+            onClick={handleDismiss}
+            className="absolute top-4 right-4 p-2 text-purple-300 hover:text-white hover:bg-white hover:bg-opacity-10 rounded-xl transition-all duration-300"
           >
-            <IoClose className="w-6 h-6" />
+            <IoClose className="w-5 h-5" />
           </button>
-        </div>
-      </div>
 
-      {/* Stats Banner */}
-      <div className="bg-white border-x-2 border-yellow-200 px-8 py-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <IoTrendingUp className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Đã có</p>
-              <p className="font-bold text-lg text-gray-900">12,547 người</p>
-              <p className="text-xs text-gray-500">nâng cấp Premium</p>
-            </div>
+          <div className="inline-flex items-center space-x-2 px-4 py-2 bg-white bg-opacity-95 rounded-full text-orange-600 text-sm font-semibold mb-6 shadow-lg">
+            <IoFlash className="w-4 h-4" />
+            <span>Ưu đãi độc quyền - Chỉ trong 24h!</span>
+            <IoGift className="w-4 h-4" />
           </div>
 
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <IoShield className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Tiết kiệm</p>
-              <p className="font-bold text-lg text-gray-900">99,000₫</p>
-              <p className="text-xs text-gray-500">mỗi tháng</p>
-            </div>
-          </div>
+          <h2 className="text-4xl font-black text-white mb-4">
+            Nâng cấp lên{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">
+              Premium
+            </span>
+          </h2>
 
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-              <IoTime className="w-5 h-5 text-red-600" />
+          <p className="text-purple-200 text-lg mb-8 max-w-2xl mx-auto">
+            Mở khóa toàn bộ sức mạnh của nền tảng quản lý tài liệu thông minh
+            với AI
+          </p>
+
+          {/* Trust Indicators */}
+          <div className="flex items-center justify-center space-x-8 text-sm">
+            <div className="flex items-center space-x-2 text-purple-200">
+              <IoStar className="w-4 h-4 text-yellow-400" />
+              <span>4.9/5 từ 25K+ người dùng</span>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Còn lại</p>
-              <p className="font-bold text-lg text-gray-900">147 suất</p>
-              <p className="text-xs text-gray-500">ưu đãi 50%</p>
+            <div className="flex items-center space-x-2 text-purple-200">
+              <IoShield className="w-4 h-4 text-green-400" />
+              <span>Hoàn tiền 100% trong 30 ngày</span>
+            </div>
+            <div className="flex items-center space-x-2 text-purple-200">
+              <IoFlash className="w-4 h-4 text-blue-400" />
+              <span>Kích hoạt tức thì</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Premium Card */}
-      <div className="bg-white border-x-2 border-b-2 border-yellow-200 rounded-b-2xl p-8">
-        <div className="w-full">
-          <PremiumCard onUpgrade={handleUpgrade} />
-        </div>
+      {/* Pricing Cards with Modern Design */}
+      <div className="grid lg:grid-cols-3 gap-6 mt-8">
+        {plans.map((plan) => (
+          <div
+            key={plan.id}
+            className={`relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:scale-105 ${
+              plan.popular
+                ? "ring-4 ring-purple-500 ring-opacity-50 scale-105"
+                : ""
+            }`}
+          >
+            {/* Popular Badge */}
+            {plan.popular && (
+              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                <div className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-full text-sm font-bold shadow-lg">
+                  {plan.badge}
+                </div>
+              </div>
+            )}
+
+            <div className="p-8">
+              {/* Plan Header */}
+              <div className="text-center mb-8">
+                <div
+                  className={`w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-r ${plan.gradient} flex items-center justify-center shadow-lg`}
+                >
+                  {plan.icon}
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  {plan.name}
+                </h3>
+                <div
+                  className={`inline-block px-3 py-1 bg-gradient-to-r ${plan.gradient} text-white rounded-full text-sm font-semibold`}
+                >
+                  {plan.badge}
+                </div>
+              </div>
+
+              {/* Pricing */}
+              <div className="text-center mb-8">
+                <div className="text-sm text-gray-500 line-through mb-2">
+                  {plan.originalPrice}
+                </div>
+                <div className="flex items-baseline justify-center space-x-2 mb-2">
+                  <span className="text-4xl font-black text-gray-900">
+                    {plan.price}
+                  </span>
+                  <span className="text-lg text-gray-600">{plan.period}</span>
+                </div>
+                <div className="text-sm text-green-600 font-semibold">
+                  Tiết kiệm 50%
+                </div>
+              </div>
+
+              {/* Features */}
+              <div className="mb-8">
+                <ul className="space-y-3">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-start space-x-3">
+                      <div
+                        className={`w-5 h-5 rounded-full bg-gradient-to-r ${plan.gradient} flex items-center justify-center flex-shrink-0 mt-0.5`}
+                      >
+                        <IoCheckmark className="w-3 h-3 text-white" />
+                      </div>
+                      <span className="text-gray-700 text-sm leading-relaxed">
+                        {feature}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* CTA Button */}
+              <button
+                onClick={() => handleUpgrade(plan.id)}
+                className={`w-full py-4 px-6 bg-gradient-to-r ${plan.gradient} text-white font-bold text-lg rounded-xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 group`}
+              >
+                <IoRocket className="w-5 h-5 group-hover:animate-bounce" />
+                <span>Chọn {plan.name}</span>
+                <IoSparkles className="w-5 h-5 group-hover:animate-spin" />
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
 
-      {/* Trust Indicators */}
-      <div className="mt-6 bg-gray-50 rounded-2xl p-6">
-        <div className="text-center mb-4">
-          <h3 className="font-semibold text-gray-900 mb-2">
-            Được tin tưởng bởi hàng nghìn doanh nghiệp
-          </h3>
+      {/* Bottom CTA Section */}
+      <div className="mt-12 text-center bg-gradient-to-r from-gray-50 to-blue-50 rounded-2xl p-8">
+        <div className="flex items-center justify-center space-x-2 mb-4">
+          <IoHeart className="w-6 h-6 text-red-500" />
+          <span className="text-xl font-bold text-gray-900">
+            Được tin tưởng bởi 25,000+ doanh nghiệp
+          </span>
+          <IoHeart className="w-6 h-6 text-red-500" />
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div className="p-4 bg-white rounded-xl">
+        <div className="grid grid-cols-4 gap-8 max-w-2xl mx-auto mb-6">
+          <div className="text-center">
             <div className="text-2xl font-bold text-blue-600">99.9%</div>
             <div className="text-sm text-gray-600">Uptime</div>
           </div>
-          <div className="p-4 bg-white rounded-xl">
+          <div className="text-center">
             <div className="text-2xl font-bold text-green-600">24/7</div>
-            <div className="text-sm text-gray-600">Hỗ trợ</div>
+            <div className="text-sm text-gray-600">Support</div>
           </div>
-          <div className="p-4 bg-white rounded-xl">
-            <div className="text-2xl font-bold text-purple-600">100GB</div>
-            <div className="text-sm text-gray-600">Lưu trữ</div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-purple-600">50M+</div>
+            <div className="text-sm text-gray-600">Files Processed</div>
           </div>
-          <div className="p-4 bg-white rounded-xl">
-            <div className="text-2xl font-bold text-orange-600">30 ngày</div>
-            <div className="text-sm text-gray-600">Hoàn tiền</div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-orange-600">30 Days</div>
+            <div className="text-sm text-gray-600">Money Back</div>
           </div>
         </div>
+
+        <p className="text-gray-600 text-sm">
+          Không cần thẻ tín dụng • Kích hoạt ngay lập tức • Hủy bất kỳ lúc nào •
+          Bảo mật SSL 256-bit
+        </p>
       </div>
     </div>
   );
