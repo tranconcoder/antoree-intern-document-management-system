@@ -6,4 +6,5 @@ const getBaseURL = () => {
   return "http://ec2-16-176-232-14.ap-southeast-2.compute.amazonaws.com:4000";
 };
 
-export const AXIOS_URL = getBaseURL();
+export const AXIOS_URL =
+  "http://ec2-16-176-232-14.ap-southeast-2.compute.amazonaws.com:4000";

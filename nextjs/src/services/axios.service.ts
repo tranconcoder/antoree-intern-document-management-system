@@ -2,7 +2,7 @@ import axios, { AxiosError, AxiosHeaders, AxiosRequestConfig } from "axios";
 import { AXIOS_URL } from "@/configs/axios.config";
 import { RefreshTokenResponse } from "@/types/response";
 
-const xiosInstance = axios.create({
+const axiosInstance = axios.create({
   baseURL: AXIOS_URL,
   headers: {
     "Content-Type": "application/json",
