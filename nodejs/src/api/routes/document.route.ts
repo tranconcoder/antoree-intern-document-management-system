@@ -24,4 +24,10 @@ documentRouter.get("/:id", documentController.getDocumentById);
 
 documentRouter.get("/:id/file-data", documentController.getDocumentFileData);
 
+documentRouter.delete(
+  "/:id",
+  validateToken,
+  documentController.deleteSelfDocument
+);
+
 export default documentRouter;

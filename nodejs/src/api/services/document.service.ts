@@ -151,4 +151,37 @@ export default new (class DocumentService {
       files: filesWithBase64Data,
     };
   }
+
+  async deleteSelfDocument(documentId: string, userId: string) {
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(documentId)) {
+      throw new Error("Invalid document ID format");
+    }
+
+    console.log(
+      `Attempting to delete document ${documentId} for user ${userId}`
+    );
+
+    // Find document and ensure it belongs to the user
+    const document = await documentModel.findOne({
+      _id: documentId,
+      userId: userId,
+    });
+
+    if (!document) {
+      throw new Error(
+        "Document not found or you don't have permission to delete it"
+      );
+    }
+
+    // Delete the document
+    await documentModel.findByIdAndDelete(documentId);
+
+    console.log(`Document ${documentId} deleted successfully`);
+    return {
+      deleted: true,
+      documentId: documentId,
+      message: "Document deleted successfully",
+    };
+  }
 })();

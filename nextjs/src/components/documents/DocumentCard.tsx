@@ -14,6 +14,7 @@ import {
   IoGlobe,
 } from "react-icons/io5";
 import { formatFileSize, getFileTypeDisplay } from "@/configs/upload.config";
+import { DeleteDocumentDialog } from "./DeleteDocumentDialog";
 import type { Document, DocumentFile } from "@/types/document";
 
 interface DocumentCardProps {
@@ -36,6 +37,7 @@ export default function DocumentCard({
   isOwner = false,
 }: DocumentCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   // Format date
   const formatDate = (dateString: string): string => {
@@ -72,9 +74,7 @@ export default function DocumentCard({
 
   const handleDelete = () => {
     if (onDelete && isOwner) {
-      if (confirm(`Bạn có chắc chắn muốn xóa tài liệu "${document.title}"?`)) {
-        onDelete(document._id);
-      }
+      setShowDeleteDialog(true);
     }
   };
 
@@ -141,7 +141,7 @@ export default function DocumentCard({
                   {primaryFile.fileName}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {getFileTypeDisplay(primaryFile.contentType)} •{" "}
+                  {getFileTypeDisplay(primaryFile.contentType || "")} •{" "}
                   {formatFileSize(primaryFile.fileSize)}
                 </p>
               </div>
@@ -191,7 +191,7 @@ export default function DocumentCard({
                         {file.fileName}
                       </p>
                       <p className="text-xs text-gray-500">
-                        {getFileTypeDisplay(file.contentType)} •{" "}
+                        {getFileTypeDisplay(file.contentType || "")} •{" "}
                         {formatFileSize(file.fileSize)}
                       </p>
                     </div>
@@ -215,7 +215,7 @@ export default function DocumentCard({
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2 text-xs text-gray-500">
             <IoTime className="w-4 h-4" />
-            <span>{formatDate(document.created_at)}</span>
+            <span>{formatDate(document.createdAt)}</span>
           </div>
         </div>
 
@@ -239,6 +239,20 @@ export default function DocumentCard({
           )}
         </div>
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteDocumentDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        documentId={document._id}
+        documentTitle={document.title}
+        documentFileCount={document.files.length}
+        documentSize={formatFileSize(totalSize)}
+        onDeleted={() => {
+          setShowDeleteDialog(false);
+          onDelete?.(document._id);
+        }}
+      />
     </div>
   );
 }

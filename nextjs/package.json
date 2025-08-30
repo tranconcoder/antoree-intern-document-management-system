@@ -3,9 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "node server.js",
+    "dev:http": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
+    "start:https": "NODE_ENV=production node server.js",
     "lint": "biome check",
     "format": "biome format --write"
   },
@@ -16,6 +18,8 @@
     "@reduxjs/toolkit": "^2.8.2",
     "axios": "^1.11.0",
     "formik": "^2.4.6",
+    "gtag": "^1.0.1",
+    "lucide-react": "^0.542.0",
     "mammoth": "^1.10.0",
     "next": "15.5.0",
     "pdfjs-dist": "^5.4.54",

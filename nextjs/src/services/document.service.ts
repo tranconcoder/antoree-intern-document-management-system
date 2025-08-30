@@ -76,6 +76,46 @@ class DocumentService {
   }
 
   /**
+   * Delete document by ID
+   */
+  async deleteDocument(
+    id: string
+  ): Promise<{ deleted: boolean; message: string }> {
+    try {
+      const response = await axiosInstance.delete(`/documents/${id}`);
+
+      if (response.status === HttpStatusCode.Ok) {
+        return response.data.metadata;
+      }
+
+      throw new Error("Failed to delete document");
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete self document by ID (only documents owned by current user)
+   */
+  async deleteSelfDocument(
+    id: string
+  ): Promise<{ deleted: boolean; message: string }> {
+    try {
+      const response = await axiosInstance.delete(`/documents/${id}`);
+
+      if (response.status === HttpStatusCode.Ok) {
+        return response.data.metadata;
+      }
+
+      throw new Error("Failed to delete self document");
+    } catch (error) {
+      console.error("Error deleting self document:", error);
+      throw error;
+    }
+  }
+
+  /**
    * Download file từ document
    */
   downloadFile(file: { data: string; fileName: string; contentType?: string }) {

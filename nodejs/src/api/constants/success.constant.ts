@@ -41,6 +41,12 @@ export const successResponses = {
     "Documents fetched successfully",
   ] as SuccessResponseItem,
 
+  DOCUMENT_DELETE_SUCCESS: [
+    HttpStatus.OK,
+    "Document Delete Success",
+    "Document deleted successfully",
+  ] as SuccessResponseItem,
+
   // General success
   OK: [
     HttpStatus.OK,

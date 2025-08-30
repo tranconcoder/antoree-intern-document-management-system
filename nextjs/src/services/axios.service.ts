@@ -11,12 +11,26 @@ const axiosInstance = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  // For HTTPS development, ignore self-signed certificate errors
+  ...(typeof window === "undefined" &&
+    process.env.NODE_ENV === "development" && {
+      httpsAgent: new (require("https").Agent)({
+        rejectUnauthorized: false,
+      }),
+    }),
 });
 
 // Separate instance for token refresh to avoid interceptor recursion
 const refreshClient = axios.create({
   baseURL: AXIOS_URL,
   headers: { "Content-Type": "application/json" },
+  // For HTTPS development, ignore self-signed certificate errors
+  ...(typeof window === "undefined" &&
+    process.env.NODE_ENV === "development" && {
+      httpsAgent: new (require("https").Agent)({
+        rejectUnauthorized: false,
+      }),
+    }),
 });
 
 // Normalize headers to AxiosHeaders without unsafe casts

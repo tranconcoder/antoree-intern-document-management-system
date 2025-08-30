@@ -98,9 +98,16 @@ export default function DocumentsPage() {
   // Handle document actions
   const handleDeleteDocument = async (documentId: string) => {
     try {
+      // Remove document from state immediately for better UX
+      setSelfDocuments((prev) => prev.filter((doc) => doc._id !== documentId));
+
+      // Optionally reload the entire list to ensure consistency
+      // loadDocuments();
     } catch (error) {
       console.error("Error deleting document:", error);
       alert("Có lỗi xảy ra khi xóa tài liệu");
+      // Reload on error to restore state
+      loadDocuments();
     }
   };
 

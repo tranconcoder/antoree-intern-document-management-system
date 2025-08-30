@@ -47,4 +47,16 @@ export default new (class DocumentController {
       metadata: await documentService.getDocumentFileData(id as string),
     }).sendResponse(res);
   };
+
+  deleteSelfDocument: RequestHandler = async (req, res) => {
+    const { id } = req.params;
+
+    new SuccessResponse({
+      successResponseItem: successResponses.DOCUMENT_DELETE_SUCCESS,
+      metadata: await documentService.deleteSelfDocument(
+        id as string,
+        req.userId
+      ),
+    }).sendResponse(res);
+  };
 })();
